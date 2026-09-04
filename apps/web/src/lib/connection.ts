@@ -1,4 +1,4 @@
-import { geohashBounds, SyntheticAirspace, airlineFromCallsign, resolveCategory, type Aircraft, type ServerMessage, type StateVector } from '@overhead/shared';
+import { geohashBounds, parseOpenSkyResponse, parseReadsbResponse, SyntheticAirspace, airlineFromCallsign, resolveCategory, type Aircraft, type ServerMessage, type StateVector } from '@overhead/shared';
 import { API_URL, POLL_INTERVAL_MS, TRANSPORT, WS_URL } from './api';
 
 export type ConnStatus = 'connecting' | 'live' | 'cached' | 'demo' | 'offline';
@@ -11,8 +11,16 @@ interface Opts {
   demoCenter: () => { lat: number; lon: number };
 }
 
+/** No aircraft database in the browser: the category comes from the type code the feed supplies, or the emitter class. */
 function enrichLocal(sv: StateVector): Aircraft {
-  return { ...sv, category: resolveCategory({ typeCode: sv.typeCode, typeDescription: sv.typeDescription, emitterCategory: sv.emitterCategory }), operator: airlineFromCallsign(sv.callsign), model: null, airline: airlineFromCallsign(sv.callsign) };
+  const airline = airlineFromCallsign(sv.callsign);
+  return {
+    ...sv,
+    category: resolveCategory({ typeCode: sv.typeCode, typeDescription: sv.typeDescription, emitterCategory: sv.emitterCategory }),
+    operator: airline,
+    model: sv.typeDescription,
+    airline,
+  };
 }
 
 /**
@@ -99,7 +107,13 @@ export class Connection {
   /** No WebSocket? Use the HTTP frame endpoint (relay or edge functions); nothing at all? Demo traffic. */
   private async probeHttpOrDemo(): Promise<void> {
     try {
-      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json()) as { provider: string; attribution: string };
+      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json()) as
+        { provider: string; attribution: string; frameEndpoint?: 'raw' | 'enriched'; feedFormat?: 'opensky' | 'readsb'; pollIntervalMs?: number; pollTiles?: number };
+      this.feedKind = cfg.frameEndpoint === 'raw' ? 'raw' : 'enriched';
+      this.feedFormat = cfg.feedFormat === 'readsb' ? 'readsb' : 'opensky';
+      // the server decides the cadence and how many tiles a round may cost, because it owns the credit budget
+      this.pollIntervalMs = Math.max(10_000, cfg.pollIntervalMs ?? POLL_INTERVAL_MS);
+      this.pollTiles = Math.max(1, Math.min(4, cfg.pollTiles ?? 2));
       this.setInfo({ provider: cfg.provider, attribution: cfg.attribution, status: this.lastFrameAt ? 'cached' : 'connecting', detail: TRANSPORT === 'poll' ? undefined : 'WebSocket unavailable — polling over HTTP' });
       this.startHttpPolling();
     } catch {
@@ -111,11 +125,17 @@ export class Connection {
   private httpLastAt = 0;
   private httpFailures = 0;
   private httpInFlight = false;
+  /** 'enriched' = the relay's pre-joined frames; 'raw' = the upstream's own JSON from the proxy, parsed here */
+  private feedKind: 'enriched' | 'raw' = 'enriched';
+  /** which wire format /api/feed returns when feedKind is 'raw' */
+  private feedFormat: 'opensky' | 'readsb' = 'opensky';
+  private pollIntervalMs = POLL_INTERVAL_MS;
+  private pollTiles = 2;
 
   private startHttpPolling(): void {
     if (this.httpTimer) return;
     void this.httpRound();
-    this.httpTimer = setInterval(() => void this.httpRound(), POLL_INTERVAL_MS);
+    this.httpTimer = setInterval(() => void this.httpRound(), this.pollIntervalMs);
   }
 
   /**
@@ -130,8 +150,9 @@ export class Connection {
     this.httpLastAt = Date.now();
     let ok = 0, remaining: number | null = null;
     try {
-      for (const tile of this.tiles.slice(0, 2)) {
-        const res = await fetch(`${API_URL}/api/tiles/${tile}/frame`, { signal: AbortSignal.timeout(15_000) });
+      for (const tile of this.tiles.slice(0, this.pollTiles)) {
+        const url = this.feedKind === 'raw' ? `${API_URL}/api/feed?tile=${tile}` : `${API_URL}/api/tiles/${tile}/frame`;
+        const res = await fetch(url, { signal: AbortSignal.timeout(15_000) });
         const rem = res.headers.get('x-credits-remaining');
         if (rem != null && rem !== '' && Number.isFinite(Number(rem))) remaining = Number(rem);
         if (res.status === 429) {
@@ -143,9 +164,16 @@ export class Connection {
         }
         if (res.status === 404) continue; // relay has no frame for this tile yet
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const f = (await res.json()) as { t: number; aircraft: Aircraft[] };
+        if (this.feedKind === 'raw') {
+          // the upstream's own JSON, through the shared parser for that format, then local enrichment
+          const body = await res.json();
+          const parsed = this.feedFormat === 'readsb' ? parseReadsbResponse(body) : parseOpenSkyResponse(body);
+          this.opts.onFrame(parsed.aircraft.map(enrichLocal), parsed.time * 1000);
+        } else {
+          const f = (await res.json()) as { t: number; aircraft: Aircraft[] };
+          this.opts.onFrame(f.aircraft, f.t);
+        }
         this.lastFrameAt = Date.now();
-        this.opts.onFrame(f.aircraft, f.t);
         ok++;
       }
       this.httpFailures = 0;
