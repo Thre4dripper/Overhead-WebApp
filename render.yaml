@@ -1,0 +1,24 @@
+# Render.com alternative for the API. The free plan sleeps when idle, which stops the poller; use "starter".
+services:
+  - type: web
+    name: overhead-api
+    runtime: docker
+    dockerfilePath: apps/api/Dockerfile
+    plan: starter
+    envVars:
+      - key: AIRCRAFT_PROVIDER
+        value: opensky
+      - key: OPENSKY_CLIENT_ID
+        sync: false
+      - key: OPENSKY_CLIENT_SECRET
+        sync: false
+      - key: OPENSKY_DAILY_CREDITS
+        value: "4000"
+      - key: CORS_ORIGIN
+        value: https://overhead.vercel.app
+      - key: AIRCRAFT_DB_CSV
+        value: /data/aircraft-db.csv
+    disk:
+      name: overhead-data
+      mountPath: /data
+      sizeGB: 1
