@@ -1,5 +1,5 @@
 import { bearingDeg, displayCallsign, elevationDeg, haversineM, tilesCovering } from '@overhead/shared';
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Home } from './components/Home';
 import { Live } from './components/Live';
 import { evaluateRules, notify } from './lib/account';
@@ -12,6 +12,9 @@ import { traffic } from './lib/traffic';
 import { lowEndDevice } from './lib/webgl';
 
 runtime.lowEnd = lowEndDevice();
+
+/** The docs reader carries a markdown renderer, so it loads only when someone opens /docs. */
+const Docs = lazy(() => import('./components/Docs'));
 
 export default function App() {
   const route = useRoute();
@@ -85,6 +88,7 @@ export default function App() {
     return () => clearInterval(id);
   }, [route]);
 
+  if (route === 'docs') return <Suspense fallback={<div className="docs"><div className="docs-body"><main className="docs-main"><p className="muted">Loading…</p></main></div></div>}><Docs /></Suspense>;
   if (route === 'live' && onboarded) return <Live />;
   return (
     <>

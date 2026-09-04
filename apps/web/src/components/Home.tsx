@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CITIES } from '../lib/cities';
 import { iconMarkup } from '../lib/icons';
+import { DOCS } from '../lib/docsIndex';
 import { navigate } from '../lib/router';
 import { useApp, type Home as HomeLoc } from '../lib/store';
 import { hasWebGL2 } from '../lib/webgl';
@@ -76,6 +77,22 @@ export function Home() {
           <h2>A logbook, if you want one</h2>
           <p>Tap "Log sighting" on any aircraft and it goes into a logbook kept in this browser, with stamps for firsts, wide-bodies, helicopters, rare types and night sightings. Set a watch rule and get a nudge when a type or registration passes over your home while the app is open.</p>
         </article>
+      </section>
+
+      <section className="docs-teaser">
+        <div className="teaser-head">
+          <h2>Written down, properly</h2>
+          <p>Every decision in this project was recorded as it was made, along with what was measured to justify it. It is all readable here, not buried in a commit log.</p>
+        </div>
+        <div className="teaser-grid">
+          {DOCS.slice(0, 6).map((d) => (
+            <button key={d.slug} className="teaser-card" onClick={() => navigate(`/docs/${d.slug}`)}>
+              <span className="t">{d.title}</span>
+              <span className="b">{d.blurb}</span>
+            </button>
+          ))}
+        </div>
+        <button className="btn" onClick={() => navigate('/docs')}>Read the documentation</button>
       </section>
 
       <section className="how">

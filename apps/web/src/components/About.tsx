@@ -19,6 +19,7 @@ export function About() {
         <button className="btn" onClick={() => s.setPanel('logbook')}>Logbook</button>
         <button className="btn" onClick={() => s.setPanel('alerts')}>Alerts</button>
         <button className="btn" onClick={() => s.setPanel('ar')}>Point at the sky</button>
+        <button className="btn" onClick={() => { s.setPanel(null); navigate('/docs'); }}>Docs</button>
         <button className="btn" onClick={() => { s.setPanel(null); navigate('/'); }}>Home page</button>
       </div>
 
