@@ -30,11 +30,20 @@ export function registerRoutes(app: FastifyInstance, deps: {
     metaRows: deps.meta.size,
   }));
 
-  /** HTTP fallback for the cached frame when WebSockets are blocked. */
+  /**
+   * HTTP polling transport (same contract as the Vercel edge function). A poll leases the tile for 60 s
+   * so the poller keeps it live; the first request waits up to 4 s for the first frame instead of 404ing.
+   */
   app.get<{ Params: { tile: string } }>('/api/tiles/:tile/frame', async (req, reply) => {
-    if (!isValidGeohash(req.params.tile)) return reply.code(400).send({ error: 'bad tile' });
-    const f = await deps.store.getFrame(req.params.tile);
+    const tile = req.params.tile.toLowerCase();
+    if (!isValidGeohash(tile)) return reply.code(400).send({ error: 'bad tile' });
+    const leaseId = `${req.ip}|${req.headers['user-agent'] ?? ''}`.slice(0, 200);
+    deps.subs.touchHttp(leaseId, tile);
+    let f = await deps.store.getFrame(tile);
+    for (let i = 0; !f && i < 8; i++) { await new Promise((r) => setTimeout(r, 500)); f = await deps.store.getFrame(tile); }
     if (!f) return reply.code(404).send({ error: 'no frame yet' });
+    reply.header('cache-control', 'no-store');
+    reply.header('x-credits-remaining', '');
     return f;
   });
 

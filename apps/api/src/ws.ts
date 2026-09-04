@@ -12,8 +12,25 @@ export class Subscriptions {
   private nextId = 1;
   constructor(private readonly store: TileStore, private readonly poller: TilePoller) {}
 
-  get clientCount(): number { return this.clients.size; }
+  get clientCount(): number { return this.clients.size + this.httpLeases.size; }
   tileCounts(): Record<string, number> { return Object.fromEntries(this.counts); }
+
+  /** HTTP pollers hold a 60 s lease per tile so the poller keeps that tile live without a socket. */
+  private httpLeases = new Map<string, { tiles: Set<string>; expiresAt: number }>();
+  touchHttp(leaseId: string, tile: string): void {
+    const now = Date.now();
+    let lease = this.httpLeases.get(leaseId);
+    if (!lease) { lease = { tiles: new Set(), expiresAt: 0 }; this.httpLeases.set(leaseId, lease); }
+    lease.expiresAt = now + 60_000;
+    if (!lease.tiles.has(tile)) { lease.tiles.add(tile); void this.bump(tile, +1); this.poller.notifyChange(); }
+    // expire stale leases
+    for (const [id, l] of this.httpLeases) {
+      if (l.expiresAt > now) continue;
+      for (const t of l.tiles) void this.bump(t, -1);
+      this.httpLeases.delete(id);
+      this.poller.notifyChange();
+    }
+  }
 
   add(ws: WebSocket): Client {
     const c: Client = { id: this.nextId++, ws, tiles: new Set() };
