@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" fill="none" role="img" aria-labelledby="t d">
+<title id="t">Overhead</title>
+<desc id="d">App icon for Overhead: a worm's-eye view up a canyon between two buildings, their verticals converging to a vanishing point above the canvas (512, -700), with one aircraft crossing the open sky. Reads at 48 px from three shapes only - two dark masses, the slot of sky between them, and the magenta aircraft. Safe area: all identifying content sits inside the centred circle r 410 (80% of the canvas) and clear of the corners, so round and rounded-square masks both crop only the bleeding building flanks. Full-bleed background - no transparent margin. Palette: sky #c9d6dc, near massing #1d2e44, held-back block #3e5772, aircraft #b0246e.</desc>
+<rect width="1024" height="1024" fill="#c9d6dc"></rect>
+<path d="M400 1024 L426.2 620 L610 620 L640 1024 Z" fill="#3e5772"></path>
+<path d="M-80 1024 L199.5 210 L331.5 210 L313.6 300 L412.2 300 L340 1024 Z" fill="#1d2e44"></path>
+<path d="M1104 1024 L876 360 L707.5 360 L722.3 440 L609.9 440 L660 1024 Z" fill="#1d2e44"></path>
+<g transform="translate(566 206) rotate(34) scale(4) translate(-32 -32)" fill="#b0246e">
+    <path d="M32 4 L34 11 L34.8 26 L55 43 L54.5 46.3 L35.4 41.8 L35 48.6 L44.6 58.2 L43.8 60.6 L33.2 58.4 L32.7 61.4 L31.3 61.4 L30.8 58.4 L20.2 60.6 L19.4 58.2 L29 48.6 L28.6 41.8 L9.5 46.3 L9 43 L29.2 26 L30 11 Z"></path><rect x="40.4" y="30.4" width="3.6" height="9.6" rx="1.6"></rect><rect x="20" y="30.4" width="3.6" height="9.6" rx="1.6"></rect>
+  </g>
+</svg>

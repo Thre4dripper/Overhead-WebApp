@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 176 48" width="176" height="48" fill="none" role="img" aria-label="Aircraft label, night">
+<title>Aircraft label - night: callsign and true altitude</title>
+<circle cx="9" cy="39" r="2.4" fill="#e2589b"></circle>
+<path d="M9 36.6 L9 26 L26 26" stroke="#e7edf4" stroke-width="0.75" stroke-opacity="0.7"></path>
+<rect x="26" y="6" width="146" height="26" rx="2" fill="#080c14" fill-opacity="0.5" stroke="#e7edf4" stroke-opacity="0.28" stroke-width="0.75"></rect>
+<g stroke="none" fill="#e7edf4" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <text x="34" y="18" font-size="12" font-weight="600" letter-spacing="0.06em">UAL 214</text>
+  <text x="34" y="28.5" font-size="10" letter-spacing="0.04em" fill-opacity="0.78">34 000 ft</text>
+  <text x="163" y="28.5" font-size="10" text-anchor="end" fill="#e2589b">↑</text>
+</g>
+<path d="M34 21.4 L92 21.4" stroke="#e7edf4" stroke-opacity="0.3" stroke-width="0.75"></path>
+</svg>

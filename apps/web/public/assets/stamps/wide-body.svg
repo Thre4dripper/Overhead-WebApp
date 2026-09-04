@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" fill="none" role="img" aria-labelledby="t d">
+<title id="t">Wide-body spotted</title>
+<desc id="d">Airframe data plate with rivets, struck for a four-engine wide-body. Logbook stamp, 96x96, muted palette for a buff sectional ground: ink #23384f, paper #efe7d3. Reads at 48 px from its outline and central glyph; the small caps are texture at that size.</desc>
+<rect x="7" y="16" width="82" height="64" rx="4" fill="#efe7d3" stroke="#23384f" stroke-width="2.2"></rect>
+<rect x="12" y="21" width="72" height="54" rx="2" stroke="#23384f" stroke-width="0.9" stroke-opacity="0.45"></rect>
+<g fill="#23384f" fill-opacity="0.55">
+  <circle cx="14.5" cy="23.5" r="1.7"></circle><circle cx="81.5" cy="23.5" r="1.7"></circle>
+  <circle cx="14.5" cy="72.5" r="1.7"></circle><circle cx="81.5" cy="72.5" r="1.7"></circle>
+</g>
+<g transform="translate(48 43) scale(0.74) translate(-32 -32)" fill="#3a5c7d" stroke="none"><path d="M 32 0.6 L 34.6 6.67 L 35.82 19.25 L 57.15 35.29 L 56.46 38.76 L 36.68 34.08 L 36.34 40.15 L 46.74 48.82 L 45.88 51.08 L 33.39 49 L 32.78 51.42 L 31.22 51.42 L 30.61 49 L 18.12 51.08 L 17.26 48.82 L 27.66 40.15 L 27.32 34.08 L 7.54 38.76 L 6.85 35.29 L 28.18 19.25 L 29.4 6.67 Z"></path><rect x="39.63" y="22.28" width="3.64" height="9.19" rx="1.56"></rect><rect x="20.73" y="22.28" width="3.64" height="9.19" rx="1.56"></rect><rect x="43.62" y="25.06" width="3.47" height="8.67" rx="1.47"></rect><rect x="16.91" y="25.06" width="3.47" height="8.67" rx="1.47"></rect></g>
+<path d="M22 63 L74 63" stroke="#23384f" stroke-width="0.9" stroke-opacity="0.4"></path>
+<text x="48" y="72" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle" font-size="8" letter-spacing="0.18em" fill="#23384f">WIDE-BODY</text>
+</svg>

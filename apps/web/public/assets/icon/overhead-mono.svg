@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" fill="currentColor" color="#1d2e44" role="img" aria-labelledby="tm dm">
+<title id="tm">Overhead, monochrome</title>
+<desc id="dm">Monochrome silhouette of the Overhead icon for notification badges: the two near building masses and the aircraft in currentColor on a transparent ground, with the held-back canyon block dropped so nothing merges at badge size. Safe area: all identifying content sits inside the centred circle r 410 (80% of the canvas) and clear of the corners, so round and rounded-square masks both crop only the bleeding building flanks. Full-bleed background - no transparent margin.</desc>
+<path d="M-80 1024 L199.5 210 L331.5 210 L313.6 300 L412.2 300 L340 1024 Z"></path>
+<path d="M1104 1024 L876 360 L707.5 360 L722.3 440 L609.9 440 L660 1024 Z"></path>
+<g transform="translate(566 206) rotate(34) scale(4) translate(-32 -32)" fill="currentColor">
+    <path d="M32 4 L34 11 L34.8 26 L55 43 L54.5 46.3 L35.4 41.8 L35 48.6 L44.6 58.2 L43.8 60.6 L33.2 58.4 L32.7 61.4 L31.3 61.4 L30.8 58.4 L20.2 60.6 L19.4 58.2 L29 48.6 L28.6 41.8 L9.5 46.3 L9 43 L29.2 26 L30 11 Z"></path><rect x="40.4" y="30.4" width="3.6" height="9.6" rx="1.6"></rect><rect x="20" y="30.4" width="3.6" height="9.6" rx="1.6"></rect>
+  </g>
+</svg>

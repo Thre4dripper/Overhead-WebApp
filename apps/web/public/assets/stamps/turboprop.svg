@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" fill="none" role="img" aria-labelledby="t d">
+<title id="t">Turboprop spotted</title>
+<desc id="d">Luggage-tag stamp struck for a propeller-driven sighting. Logbook stamp, 96x96, muted palette for a buff sectional ground: ink #23384f, paper #efe7d3. Reads at 48 px from its outline and central glyph; the small caps are texture at that size.</desc>
+<path d="M22 8 L74 8 A4 4 0 0 1 78 12 L78 84 A4 4 0 0 1 74 88 L22 88 A4 4 0 0 1 18 84 L18 12 A4 4 0 0 1 22 8 Z" fill="#efe7d3" stroke="#23384f" stroke-width="2.2"></path>
+<circle cx="48" cy="19" r="4.4" fill="none" stroke="#23384f" stroke-width="1.8"></circle>
+<path d="M23 27 L73 27" stroke="#23384f" stroke-width="0.9" stroke-opacity="0.45"></path>
+<g transform="translate(48 52) scale(0.7) translate(-32 -32)" fill="#a45a38" stroke="none"><path d="M 32 6.7 L 33.89 12.72 L 34.58 26.48 L 56.51 27.85 L 56.51 33.01 L 34.92 35.59 L 34.92 45.05 L 43.7 49.18 L 43.35 51.42 L 33.38 49.53 L 32.52 54 L 31.48 54 L 30.62 49.53 L 20.65 51.42 L 20.3 49.18 L 29.08 45.05 L 29.08 35.59 L 7.49 33.01 L 7.49 27.85 L 29.42 26.48 L 30.11 12.72 Z"></path><rect x="41.4" y="22.98" width="5.2" height="14" rx="2.4"></rect><rect x="17.4" y="22.98" width="5.2" height="14" rx="2.4"></rect><rect x="35.4" y="21.18" width="17.2" height="3" rx="1.5"></rect><rect x="11.4" y="21.18" width="17.2" height="3" rx="1.5"></rect></g>
+<rect x="31.1" y="70" width="33.7" height="16" fill="#efe7d3"></rect>
+<text x="48" y="81" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle" font-size="8" letter-spacing="0.18em" fill="#23384f">PROP</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 108" width="128" height="108" fill="none" stroke="currentColor" color="#e7edf4" role="img" aria-label="Zoom scale and tilt indicator, night">
+<title>Zoom scale bar and tilt indicator - night</title>
+<g stroke-width="1" stroke-linecap="square">
+  <path d="M8 26 L8 34 M8 30 L88 30 M88 26 L88 34"></path>
+  <path d="M48 27.5 L48 32.5" stroke-opacity="0.5"></path>
+</g>
+<g stroke="none" fill="currentColor" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <text x="8" y="20" font-size="11" letter-spacing="0.06em">500 m</text>
+  <text x="8" y="52" font-size="9" letter-spacing="0.18em" fill-opacity="0.7">SCALE</text>
+  <text x="8" y="98" font-size="9" letter-spacing="0.18em" fill-opacity="0.7">TILT</text>
+  <text x="46" y="99" font-size="15" letter-spacing="0.02em">42°</text>
+</g>
+<g stroke-width="1">
+  <path d="M8 78 A 26 26 0 0 1 60 78" stroke-opacity="0.55" stroke-width="0.75"></path>
+  <path d="M8 78 L60 78" stroke-opacity="0.35" stroke-width="0.75"></path>
+  <path d="M34 78 L53.3 60.7" stroke="#e2589b"></path>
+  <circle cx="34" cy="78" r="1.6" fill="currentColor" stroke="none"></circle>
+</g>
+</svg>

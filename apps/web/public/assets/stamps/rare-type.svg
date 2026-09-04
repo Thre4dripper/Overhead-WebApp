@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" fill="none" role="img" aria-labelledby="t d">
+<title id="t">Rare type</title>
+<desc id="d">Airworthiness lozenge with a burst mark, struck for an uncommon type. Logbook stamp, 96x96, muted palette for a buff sectional ground: ink #23384f, paper #efe7d3. Reads at 48 px from its outline and central glyph; the small caps are texture at that size.</desc>
+<defs><clipPath id="body-rare-type"><path d="M48 5 L91 48 L48 91 L5 48 Z"></path></clipPath></defs>
+<path d="M48 5 L91 48 L48 91 L5 48 Z" fill="#efe7d3" stroke="#23384f" stroke-width="2.2"></path>
+<path d="M48 13 L83 48 L48 83 L13 48 Z" stroke="#8e3560" stroke-width="1" stroke-opacity="0.75"></path>
+<g stroke="#8e3560" stroke-width="3.4" stroke-linecap="round">
+  <path d="M48 28 L48 54"></path><path d="M34.5 33.5 L61.5 48.5"></path><path d="M61.5 33.5 L34.5 48.5"></path>
+</g>
+<circle cx="48" cy="41" r="3.6" fill="#efe7d3" stroke="none"></circle>
+
+<g clip-path="url(#body-rare-type)"><rect x="30.4" y="61" width="35.2" height="16" fill="#efe7d3"></rect></g>
+<text x="48" y="72" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle" font-size="8.5" letter-spacing="0.2em" fill="#23384f">RARE</text>
+<path d="M48 5 L91 48 L48 91 L5 48 Z" fill="none" stroke="#23384f" stroke-width="2.2"></path>
+</svg>

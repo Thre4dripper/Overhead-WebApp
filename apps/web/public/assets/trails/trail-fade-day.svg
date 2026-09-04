@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" width="720" height="420" fill="none" role="img" aria-label="Fading gradient trail, day">
+<title>Fading gradient trail - day</title>
+<desc>Transparent overlay for a tilted 3D city view. The element with id &#34;trail&#34; IS the treatment; the small glyph at the head is the 2D aircraft icon foreshortened for the camera tilt.
+Generated from the aircraft's last 240 s of 3D positions, projected through the view camera: sx = 360 + f * x / z, sy = 210 - f * y / z, f = 686.9 px (fovV 34 deg, shallow tilt)
+Rule: centreline stroked at 9 px with round caps; the gradient runs between the two track endpoints, stop-opacity 0 -&gt; 0.26 -&gt; 0.85
+Ink: trail #b0246e, glyph #12263c. Every sample carries its own z, so the trail thins with distance as well as age.</desc>
+<defs>
+  <linearGradient id="trailfade-day" gradientUnits="userSpaceOnUse" x1="136" y1="201.8" x2="589" y2="43.9">
+    <stop offset="0" stop-color="#b0246e" stop-opacity="0"></stop>
+    <stop offset="0.45" stop-color="#b0246e" stop-opacity="0.26"></stop>
+    <stop offset="1" stop-color="#b0246e" stop-opacity="0.85"></stop>
+  </linearGradient>
+</defs>
+  <path id="trail" data-gen-projection="sx = 360 + f * x / z, sy = 210 - f * y / z, f = 686.9 px (fovV 34 deg, shallow tilt)" data-gen-samples="last 240 s" data-gen-stroke="9 px, round caps" data-gen-stops="0 / 0.26 @ 0.45 / 0.85" d="M136 201.8 L141.2 201.1 L146.4 200.4 L151.8 199.7 L157.4 199 L163 198.3 L168.7 197.5 L174.6 196.7 L180.5 195.9 L186.6 195.1 L192.7 194.2 L199 193.4 L205.3 192.5 L211.6 191.6 L218.1 190.6 L224.5 189.6 L231.1 188.7 L237.7 187.6 L244.3 186.6 L251 185.5 L257.7 184.4 L264.4 183.2 L271.1 182 L277.8 180.8 L284.6 179.5 L291.3 178.2 L298.1 176.9 L304.8 175.5 L311.6 174.1 L318.3 172.6 L325 171 L331.7 169.4 L338.4 167.8 L345.1 166 L351.8 164.2 L358.4 162.3 L365 160.4 L371.7 158.3 L378.3 156.2 L385 153.9 L391.7 151.6 L398.4 149.1 L405.2 146.4 L412 143.7 L418.9 140.7 L426 137.6 L433.2 134.3 L440.5 130.8 L448.1 127 L456 123 L464.2 118.6 L472.7 113.9 L481.8 108.8 L491.5 103.2 L501.8 97.2 L512.9 90.5 L525.1 83.1 L538.5 75 L553.4 65.8 L570 55.6 L589 43.9" stroke="url(#trailfade-day)" stroke-width="9" stroke-linecap="round"></path>
+  <g transform="translate(589 43.9) rotate(58.4) scale(0.52 0.3) translate(-32 -32)" fill="#12263c">
+    <path d="M32 4 L34 11 L34.8 26 L55 43 L54.5 46.3 L35.4 41.8 L35 48.6 L44.6 58.2 L43.8 60.6 L33.2 58.4 L32.7 61.4 L31.3 61.4 L30.8 58.4 L20.2 60.6 L19.4 58.2 L29 48.6 L28.6 41.8 L9.5 46.3 L9 43 L29.2 26 L30 11 Z"></path><rect x="40.4" y="30.4" width="3.6" height="9.6" rx="1.6"></rect><rect x="20" y="30.4" width="3.6" height="9.6" rx="1.6"></rect>
+  </g>
+</svg>

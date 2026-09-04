@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" fill="none" role="img" aria-labelledby="t d">
+<title id="t">First sighting</title>
+<desc id="d">Passport-stamp roundel struck on the first logged aircraft. Logbook stamp, 96x96, muted palette for a buff sectional ground: ink #23384f, paper #efe7d3. Reads at 48 px from its outline and central glyph; the small caps are texture at that size.</desc>
+<g transform="rotate(-6 48 48)">
+  <circle cx="48" cy="48" r="40" fill="#efe7d3" stroke="#23384f" stroke-width="2.4"></circle>
+  <circle cx="48" cy="48" r="33" stroke="#8e3560" stroke-width="1" stroke-dasharray="3 3.4" stroke-opacity="0.85"></circle>
+  <path d="M20 48 L28 48 M68 48 L76 48" stroke="#23384f" stroke-width="1.2" stroke-opacity="0.5"></path>
+  <text x="48" y="27" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle" font-size="8" letter-spacing="0.2em" fill="#23384f" fill-opacity="0.8">FIRST</text>
+  <text x="48" y="62" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle" font-size="30" font-weight="700" letter-spacing="0.02em" fill="#23384f">01</text>
+  <rect x="23.5" y="62" width="49" height="14" fill="#efe7d3"></rect>
+  <text x="48" y="72" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" text-anchor="middle" font-size="7" letter-spacing="0.18em" fill="#8e3560">SIGHTING</text>
+</g>
+</svg>

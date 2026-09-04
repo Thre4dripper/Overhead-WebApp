@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 760" width="96" height="760" fill="none" stroke="currentColor" color="#12263c" preserveAspectRatio="xMaxYMid meet" role="img" aria-label="Altitude ruler, compressed scale, day">
+<title>Altitude ruler - day ink #12263c</title>
+
+<g stroke-width="1" stroke-linecap="square">
+  <path d="M78 14 L78 746"></path>
+  <path d="M64 740 L78 740"></path>
+  <path d="M64 686 L78 686"></path>
+  <path d="M64 632 L78 632"></path>
+  <path d="M64 524 L78 524"></path>
+  <path d="M64 375.68 L78 375.68"></path>
+  <path d="M64 263.47 L78 263.47"></path>
+  <path d="M64 151.27 L78 151.27"></path>
+  <path d="M64 85.63 L78 85.63"></path>
+  <path d="M64 39.07 L78 39.07"></path>
+</g>
+<g stroke-width="0.75" stroke-opacity="0.55" stroke-linecap="square">
+  <path d="M71 713 L78 713"></path>
+  <path d="M71 659 L78 659"></path>
+  <path d="M71 578 L78 578"></path>
+  <path d="M71 458.37 L78 458.37"></path>
+  <path d="M71 411.8 L78 411.8"></path>
+  <path d="M71 321.21 L78 321.21"></path>
+  <path d="M71 197.84 L78 197.84"></path>
+  <path d="M71 115.15 L78 115.15"></path>
+  <path d="M71 60.68 L78 60.68"></path>
+  <path d="M71 20 L78 20"></path>
+</g>
+<g stroke="none" fill="currentColor" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" letter-spacing="0.06em" text-anchor="end">
+  <text x="59" y="743.80">GND</text>
+  <text x="59" y="689.80">500</text>
+  <text x="59" y="635.80">1 000</text>
+  <text x="59" y="527.80">2 000</text>
+  <text x="59" y="379.48">5 000</text>
+  <text x="59" y="267.27">10 000</text>
+  <text x="59" y="155.07">20 000</text>
+  <text x="59" y="89.43">30 000</text>
+  <text x="59" y="42.87">40 000</text>
+</g>
+<g stroke="none" fill="currentColor" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="9" letter-spacing="0.18em" text-anchor="end" fill-opacity="0.7">
+  <text x="78" y="8">FEET MSL</text>
+</g>
+</svg>
