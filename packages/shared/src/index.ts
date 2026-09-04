@@ -7,3 +7,4 @@ export * from './airlines';
 export * from './protocol';
 export * from './deadReckon';
 export * from './synthetic';
+export * from './opensky';

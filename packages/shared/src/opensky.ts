@@ -1,4 +1,4 @@
-import type { StateVector } from '@overhead/shared';
+import type { StateVector } from './types';
 import { z } from 'zod';
 
 /**
@@ -70,6 +70,22 @@ export function openskyToStateVector(raw: unknown): StateVector | null {
     positionSource: POSITION_SOURCE[s[16]] ?? 'other',
     dbFlags: null,
   };
+}
+
+/** The states/all query for a bounding box, with the emitter category (`extended=1`). */
+export function openSkyStatesUrl(base: string, bbox: { lamin: number; lomin: number; lamax: number; lomax: number }): string {
+  return `${base}/states/all?lamin=${bbox.lamin.toFixed(4)}&lomin=${bbox.lomin.toFixed(4)}&lamax=${bbox.lamax.toFixed(4)}&lomax=${bbox.lomax.toFixed(4)}&extended=1`;
+}
+
+/** Credits charged per states/all call by bounding-box area (square degrees). */
+export function openSkyCreditCost(bbox: { lamin: number; lomin: number; lamax: number; lomax: number }): number {
+  const a = Math.abs(bbox.lamax - bbox.lamin) * Math.abs(bbox.lomax - bbox.lomin);
+  return a < 25 ? 1 : a < 100 ? 2 : a < 400 ? 3 : 4;
+}
+
+/** Browser-side enrichment when no aircraft database is available: category from the emitter class, airline from the callsign. */
+export function enrichWithoutDatabase(sv: StateVector, airline: string | null, category: StateVector['emitterCategory'] extends infer _ ? import('./types').AircraftCategory : never): import('./types').Aircraft {
+  return { ...sv, category, operator: airline, model: null, airline };
 }
 
 export function parseOpenSkyResponse(json: unknown): { time: number; aircraft: StateVector[]; rejected: number } {

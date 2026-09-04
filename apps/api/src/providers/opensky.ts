@@ -1,6 +1,5 @@
-import { bboxAreaSqDeg, type AircraftProvider, type BBox, type StateVector } from '@overhead/shared';
+import { openSkyCreditCost, openSkyStatesUrl, parseOpenSkyResponse, type AircraftProvider, type BBox, type StateVector } from '@overhead/shared';
 import { fetchJson } from './http';
-import { parseOpenSkyResponse } from './openskyParser';
 
 const TOKEN_URL = 'https://auth.opensky-network.org/auth/realms/opensky-network/protocol/openid-connect/token';
 
@@ -17,10 +16,7 @@ export class OpenSkyProvider implements AircraftProvider {
 
   constructor(private readonly clientId?: string, private readonly clientSecret?: string, private readonly base = 'https://opensky-network.org/api') {}
 
-  readonly costHint = (b: BBox): number => {
-    const a = bboxAreaSqDeg(b);
-    return a < 25 ? 1 : a < 100 ? 2 : a < 400 ? 3 : 4;
-  };
+  readonly costHint = (b: BBox): number => openSkyCreditCost(b);
 
   private async accessToken(): Promise<string | null> {
     if (!this.clientId || !this.clientSecret) return null;
@@ -37,11 +33,8 @@ export class OpenSkyProvider implements AircraftProvider {
   }
 
   async fetchBox(bbox: BBox): Promise<StateVector[]> {
-    const q = new URLSearchParams({
-      lamin: bbox.lamin.toFixed(4), lomin: bbox.lomin.toFixed(4), lamax: bbox.lamax.toFixed(4), lomax: bbox.lomax.toFixed(4), extended: '1',
-    });
     const token = await this.accessToken();
-    const json = await fetchJson(`${this.base}/states/all?${q}`, { headers: token ? { authorization: `Bearer ${token}` } : {} , timeoutMs: 12000 });
+    const json = await fetchJson(openSkyStatesUrl(this.base, bbox), { headers: token ? { authorization: `Bearer ${token}` } : {}, timeoutMs: 12000 });
     return parseOpenSkyResponse(json).aircraft;
   }
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { AircraftProvider, BBox, StateVector } from '@overhead/shared';
 import { AircraftMetaStore, parseCsvLine } from './meta';
 import { TilePoller, clusterTiles } from './poller';
-import { openskyToStateVector, parseOpenSkyResponse } from './providers/openskyParser';
+import { openskyToStateVector, parseOpenSkyResponse } from '@overhead/shared';
 import { MemoryTileStore } from './store/memory';
 
 describe('OpenSky parser', () => {
