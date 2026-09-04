@@ -1,128 +1,181 @@
-# Overhead
+<div align="center">
 
-The aircraft above your city, right now, in a tilted 3D view of your actual streets. A free hobby
-project: MapLibre GL JS owns terrain, extruded buildings and the camera; a three.js custom layer draws
-live OpenSky traffic as instanced low-poly models at **compressed** heights, with the true altitude on
-every label and a ruler that shows the compression honestly. No accounts, no databases: your logbook
-and alert rules stay in your browser.
+<img src="apps/web/public/assets/icon/overhead.svg" width="88" alt="Overhead" />
 
-```
-pnpm install
-cp .env.example .env          # defaults work as-is; see docs/configuration.md
-pnpm dev                      # relay on :8787, web on https://localhost:5173 (self-signed cert)
-```
+# Overhead ✈️
 
-**Configuration in one line each:** `FEED` chooses the aircraft source (`adsblol`, `opensky`, `demo`)
-and is read by whichever server you run; `REFRESH_SECONDS` sets how often an area is refreshed;
-`VITE_API_URL` tells the browser where the feed lives (blank means this same origin). Everything else
-has a sensible default. **[docs/configuration.md](docs/configuration.md)** has the full reference and a
-recipe per deployment.
+**The aircraft above your city, right now — over a tilted 3D view of your actual streets.**
 
-With `FEED=opensky` the relay downloads OpenSky's aircraft database (~95 MB) into `data/` on first
-start, because OpenSky's positions carry no aircraft type or registration; the community feeds carry
-both, so nothing is downloaded for them. Routes: `/` homepage, `/live` the view.
+[**🔭 Open the live app**](https://overhead.ijlalahmad.dev) · [**📚 Read the docs**](https://overhead.ijlalahmad.dev/docs) · [**🗺️ Try London**](https://overhead.ijlalahmad.dev/live?at=51.47,-0.30) · [**🌃 Try it at night**](https://overhead.ijlalahmad.dev/live?at=51.47,-0.30&theme=night)
 
-## Layout
+`TypeScript` · `React` · `MapLibre GL JS` · `three.js` · `Fastify` · free to run
 
-| Path | What |
+<img src="docs/images/hero-desktop.png" alt="A tilted 3D view of west London in buff and tan, two aircraft labelled with their true altitudes, an altitude ruler down the right edge" width="100%" />
+
+</div>
+
+---
+
+## 🛩️ What it does
+
+Open it and the buildings around you stand up in low-poly form. Live traffic moves above them at
+readable heights. Tap an aircraft for its true altitude, speed, heading, type and registration, and
+orbit a 3D model of what you are looking at.
+
+<table>
+<tr>
+<td width="33%"><img src="docs/images/phone-live.png" alt="Phone: daytime 3D city with the HUD" /></td>
+<td width="33%"><img src="docs/images/phone-night.png" alt="Phone: night view with lit streets" /></td>
+<td width="33%"><img src="docs/images/phone-detail.png" alt="Phone: aircraft detail panel with an orbitable 3D model" /></td>
+</tr>
+<tr>
+<td align="center"><b>🌞 Day</b><br /><sub>Buff grounds, hairline chart linework</sub></td>
+<td align="center"><b>🌙 Night</b><br /><sub>Dark buildings, lit streets, nav lights</sub></td>
+<td align="center"><b>🔍 Tap anything</b><br /><sub>True altitude, orbitable model</sub></td>
+</tr>
+</table>
+
+|  | |
 |---|---|
-| `packages/altitude` | `visualHeight` / `trueHeight` / ruler ticks — the one compression function, with monotonicity tests |
-| `packages/shared` | types, units, geohash tiles, geo math, category tables, airline prefixes, WS protocol, dead reckoning, synthetic airspace |
-| `apps/api` | Fastify: OpenSky (OAuth2, credit-budgeted) and demo providers, in-memory tile poller with clustering, WebSocket fan-out, aircraft-database join, declination proxy |
-| `apps/web` | React + Vite PWA: homepage, MapLibre style in sectional-chart palette with night street lighting, three.js aircraft layer (spinning props, trails, drop lines, clouds), HUD, detail panel with orbitable model, overhead list, 2D and chart fallbacks, browser-side logbook and alerts, AR sky view |
-| `docs/` | configuration reference, design system, decisions, data-source and map-data comparisons, research notes, evidence |
-| `assets/` | approved Claude Design assets (untouched); runtime copies live in `apps/web/public/assets` |
+| 📏 **Honest heights** | Altitude is compressed so cruise traffic stays in frame, and a ruler down the edge is drawn through *the same function* — so you can see the gridlines bunch up. Every label shows the real barometric altitude. |
+| 🛫 **Seven silhouettes** | Wide-body, narrow-body, regional jet, turboprop, business jet, helicopter, light piston — low-poly models with **spinning propellers and rotors**, instanced so fifty aircraft cost a handful of draw calls. |
+| 🌍 **Anywhere on Earth** | Buildings extrude where OpenStreetMap has heights and fall back to a deliberate low-rise heuristic where it does not, which is most of the planet. |
+| 🌗 **Follows the sun** | Day, golden hour and night are chosen from the real sun elevation at your location, and the lighting follows its azimuth. |
+| 🧭 **Point at the sky** | Hold the phone up and the compass places each aircraft by true bearing and elevation. |
+| 📖 **A logbook** | Tap "log sighting" and collect stamps for firsts, wide-bodies, rare types and night sightings. Stored in your browser, no account. |
+| 🛟 **Degrades honestly** | No WebGL? A sectional-style chart. Low zoom or a slow device? Flat icons on a flat map. Feed unreachable? Clearly-labelled demo traffic. |
 
-## Scripts
+<table>
+<tr>
+<td width="25%"><img src="docs/images/phone-home.png" alt="Homepage" /></td>
+<td width="25%"><img src="docs/images/phone-list.png" alt="Overhead list" /></td>
+<td width="25%"><img src="docs/images/phone-golden.png" alt="Golden hour over New York" /></td>
+<td width="25%"><img src="docs/images/phone-ar.png" alt="Point-at-the-sky view" /></td>
+</tr>
+<tr>
+<td align="center"><sub>Homepage</sub></td>
+<td align="center"><sub>Sorted by how directly overhead</sub></td>
+<td align="center"><sub>Golden hour, New York</sub></td>
+<td align="center"><sub>Point at the sky</sub></td>
+</tr>
+</table>
 
-- `pnpm test` / `pnpm typecheck` / `pnpm build`
-- `pnpm survey:buildings` — M2 evidence: height-data coverage per city from live tiles
-- `pnpm icons` — rasterise PWA icons from the SVG app icon
-- `node scripts/screenshot.mjs [outDir]` — capture the running dev server with the local Chrome (software WebGL); `node scripts/diag.mjs <url>` polls map-load state
-- `GET /api/stats` — live counters for M4/M5 (clients, active tiles, clusters, upstream calls, frames)
+## 📐 The interesting problem
 
-## Deep links
+A cruising airliner is eleven kilometres up. Buildings are a hundred metres. At true scale every
+interesting aircraft is a dot far above the frame, and the 3D city is pointless. So altitude is
+**compressed monotonically** — true to scale near the ground, logarithmic above:
 
-`/live?at=51.47,-0.30&theme=night&label=London&z=14.4&pitch=72&bearing=0` — sets the home, pins
-theme and camera. `?select=<icao24>` (used by push notifications) selects an
-aircraft once it appears.
+```
+visualHeight(h) = h                                      for h ≤ 1 000 m
+                = 1000 + 150 · ln(1 + (h − 1000) / 150)   above it
+```
 
-## Hosting
+The join is C¹-continuous, so an aircraft descending through 1 000 m does not visibly kink, and the
+function is invertible, which is what lets the ruler label real altitudes. **One module owns it**, and
+a test asserts the ruler's gridlines and the rendered aircraft come from the same function. Flight
+level 370 lands about eleven times a 150 m skyline, comfortably in frame.
 
-**Free, all on Vercel (default).** The web app plus three small Node functions in `apps/web/api/`, no
-server of your own:
+The compression is never hidden: the ruler shows it, every label carries the true altitude in feet,
+and the app says so in its own words the first time you open it.
 
-- `/api/feed?tile=<geohash4>` proxies one live feed for a ~20 km tile and is cached at Vercel's CDN for
-  `FRAME_TTL_S` (30 s), so however many people watch an area, it costs one upstream call per window.
-- `/api/config` tells the browser which wire format the feed returns; `/api/declination` backs the AR compass.
+## 🚀 Run it
 
-Set `FEED=adsblol` and `REFRESH_SECONDS=30` and deploy. Nothing else is required: no key, and
-`VITE_API_URL` stays blank because the functions are on the same origin.
+```bash
+pnpm install
+cp .env.example .env     # defaults work as-is
+pnpm dev                 # relay on :8787, web on https://localhost:5173
+```
 
-> **OpenSky does not work from Vercel.** Measured on 2026-09-04 from functions in `bom1` and `fra1` and
-> from the edge runtime: `opensky-network.org`, its `/api/states/all` and `auth.opensky-network.org` all
-> time out, while adsb.lol answers in ~57 ms and NOAA in ~690 ms from the same function. OpenSky
-> evidently refuses that egress. Your credentials are still useful — the relay below uses them, and adds
-> the aircraft-database join — but on Vercel the feed has to be one that answers. `FEED=opensky` switches
-> back if that ever changes.
+The dev server is HTTPS with a self-signed certificate on purpose: phones only expose geolocation,
+the camera and orientation sensors to secure origins, so `https://<your-lan-ip>:5173` is what makes
+the AR view and "use my location" work on a real device.
 
-Trade-offs of the free path: a 30 s cadence with dead reckoning in between rather than WebSocket push,
-one upstream call per tile rather than clustered calls, and no aircraft-database join — though adsb.lol
-carries the aircraft type and registration in the feed itself, so models and labels are still correct.
-Skip step 1 below and leave `VITE_API_URL` / `VITE_WS_URL` blank.
+Three variables do almost everything:
 
-**With the relay:** the web app is static and fits Vercel. The API is **not** a serverless function: it holds WebSockets
-open, runs a poller every few seconds and keeps the tile cache and the 520 k-row aircraft database in
-memory, none of which survive on Vercel's request-scoped functions. Host it as one always-on container
-(Fly.io, Railway, Render "starter", or any VPS) and point the Vercel build at it.
+| | |
+|---|---|
+| `FEED` | Which live source: `adsblol` (no key), `opensky` (credentials, richer), `demo` (synthetic, offline). |
+| `REFRESH_SECONDS` | How often an area is refreshed upstream. The browser is told and paces itself, dead-reckoning in between. |
+| `VITE_API_URL` | Where the browser looks for the feed. Blank means this same origin. |
 
-1. **API on Fly.io** (about $3–5/month for a 512 MB machine; adjust `fly.toml`):
-   ```
-   fly launch --no-deploy --copy-config          # accepts fly.toml, creates the app
-   fly volumes create overhead_data --size 1     # keeps the aircraft database between deploys
-   fly secrets set OPENSKY_CLIENT_ID=… OPENSKY_CLIENT_SECRET=…
-   fly deploy
-   ```
-   Then set `CORS_ORIGIN` in `fly.toml` to your Vercel URL and `fly deploy` again. Check
-   `https://<app>.fly.dev/health` and `/api/config` (the `aircraftDbRows` count fills in after the download).
-   Railway or Render work the same way from `apps/api/Dockerfile` (see `render.yaml`).
+📚 **[docs/configuration.md](docs/configuration.md)** is the full reference, with a recipe per deployment.
 
-2. **Web on Vercel**: import the repository, set **Root Directory** to `apps/web` and enable "Include
-   source files outside of the Root Directory" (the workspace packages live in `packages/`). `vercel.json`
-   already carries the install and build commands and the SPA rewrite for `/live`. Add two environment
-   variables and deploy:
-   ```
-   VITE_API_URL = https://<app>.fly.dev
-   ```
-   The WebSocket URL is derived from it, and `VITE_TRANSPORT=auto` (the default) discovers the socket
-   from `/api/config`.
-   Vercel gives you HTTPS, which the phone needs for location, camera and sensors. `?transport=poll` or
-   `?transport=ws` on the URL forces a transport when you want to compare.
+## ☁️ Deploy
 
-3. **Everything on one box** instead: build the web (`pnpm --filter @overhead/web build`), serve `apps/web/dist`
-   with any static server or reverse proxy in front of the API on the same host, leave `VITE_API_URL` blank,
-   and proxy `/api` and `/ws` to port 8787 (Caddy or nginx, with TLS).
+| | Free, all on Vercel | With the relay |
+|---|---|---|
+| **What runs** | the web app plus three small functions | the above, or any static host, plus one always-on container |
+| **Updates** | polling, cached per area at the CDN | WebSocket push |
+| **Aircraft types** | whatever the feed carries | plus OpenSky's 520 k-row database, joined on the ICAO address |
+| **Set** | `FEED=adsblol`, `REFRESH_SECONDS=30` | `VITE_API_URL` on the web, the feed variables on the relay |
+| **Cost** | nothing | a small VM, or your own machine |
 
-## Testing on a phone
+> ⚠️ **OpenSky cannot be used from Vercel.** Measured from functions in two regions and from the edge
+> runtime, every OpenSky hostname times out, while adsb.lol answers in ~57 ms from the same function.
+> The relay runs it happily. The reasoning and the measurements are in
+> [docs/decisions.md](docs/decisions.md).
 
-Open `https://<your-mac-lan-ip>:5173` on the phone and accept the self-signed certificate once.
-HTTPS is not optional: Android and iOS only expose geolocation, the camera and orientation sensors
-to secure origins, so over plain HTTP the AR view reports "no sensors" and "Use my location" fails
-while the same page works on the desktop's `localhost` (which browsers treat as secure).
+`fly.toml`, `render.yaml` and `apps/api/Dockerfile` are ready for the relay; `apps/web/vercel.json`
+carries the web build. Full walkthrough in [docs/configuration.md](docs/configuration.md).
 
-## Dev notes
+## 🧩 How it is built
 
-- Vite reads the single root `.env` (`envDir: '../../'`) and proxies `/api` and `/ws` to the relay, so
-  `VITE_API_URL` can stay blank in dev and behind one reverse proxy in production.
-- MapLibre 6's worker is bundled explicitly (`src/lib/maplibreWorker.ts`) because both Vite's dep
-  optimiser and the production bundler lose its `new URL(...)` reference otherwise.
-- OpenSky meters credits per account. The relay's poller clusters adjacent tiles into one request,
-  spends at most `OPENSKY_DAILY_CREDITS ÷ 24` per hour, and pauses everything on 429.
-- Vercel-side variables: `FEED` (`adsblol` default) and `REFRESH_SECONDS` (also the CDN cache window).
-- Every file under `apps/web/api/` becomes a public endpoint and is bundled alone: no tests there, and
-  no workspace imports. `src/lib/edge-functions.test.ts` pins the one duplicated helper.
+```
+browser ──subscribes to ~20 km geohash tiles──►  feed server  ──one call per area per interval──►  ADS-B feed
+   │                                                  │
+   │  MapLibre owns terrain, extruded buildings        │  the poller (or the CDN) makes many viewers
+   │  and the camera; a three.js custom layer          │  of one area cost a single upstream call
+   │  shares its matrix to draw aircraft, trails,      │
+   │  drop lines, nav lights and clouds                └── joins aircraft type and registration
+   │
+   └── between polls every aircraft is dead-reckoned from its last speed, track and vertical rate,
+       then eased onto the next real position, so nothing teleports at 60 fps
+```
 
-## Status
+| Path | What lives there |
+|---|---|
+| [`packages/altitude`](packages/altitude) | The one compression function, its inverse, the ruler ticks — with monotonicity tests |
+| [`packages/shared`](packages/shared) | Types, unit conversion at the boundary, geohash tiles, geo maths, category tables, feed parsers, dead reckoning |
+| [`apps/api`](apps/api) | Fastify relay: feed providers, tile poller with clustering and credit budgeting, WebSocket fan-out, aircraft-database join |
+| [`apps/web`](apps/web) | React PWA: map style, three.js aircraft layer, HUD, detail panel, logbook, AR view, docs reader, and the serverless functions in `api/` |
+| [`design/`](design) | The source 3D models and vectors, with a note on which module consumes each |
+| [`docs/`](docs) | Configuration, design system, every decision, and the research behind them |
 
-Everything through the AR view is implemented for a free, single-user-per-browser hobby deployment.
-See `docs/decisions.md` for the 2026-09-04 pivot away from accounts and databases.
+## 📚 Documentation
+
+Everything was written down as it was built, and it is readable in the app itself with a proper
+reading layout, an index and per-page contents:
+
+<div align="center">
+<a href="https://overhead.ijlalahmad.dev/docs"><img src="docs/images/docs-desktop.png" alt="The in-app documentation reader" width="100%" /></a>
+</div>
+
+| | |
+|---|---|
+| [⚙️ Configuration](docs/configuration.md) | The three moving parts, what `FEED` means, a recipe per deployment |
+| [🎨 Design system](docs/design.md) | Tokens, typography, layout and scene treatment, adapted from FAA sectional charts |
+| [🧭 Decisions](docs/decisions.md) | Every judgement call with its consequence, in the order they were made |
+| [📡 Aircraft data](docs/data-source.md) | Which feed, why, and what each one does and does not give you |
+| [🗺️ Map and heights](docs/map-data.md) | Vector tiles, terrain encoding, and the fallback that renders most of the planet |
+| [🔬 Research notes](docs/research-notes.md) | What the brief assumed, what turned out to be true, and where they differ |
+
+## 🧪 Scripts
+
+```bash
+pnpm test                      # 49 unit tests
+pnpm typecheck                 # all four workspaces
+pnpm survey:buildings          # measure height-data coverage per city, from live tiles
+pnpm icons                     # rasterise the PWA icons from the SVG app icon
+node scripts/readme-shots.mjs  # regenerate the screenshots in this file
+```
+
+## 🙏 Credits
+
+Map © [OpenFreeMap](https://openfreemap.org) © [OpenMapTiles](https://openmaptiles.org), data ©
+[OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL). Terrain: Mapzen / AWS
+open data terrain tiles. Aircraft positions: [adsb.lol](https://adsb.lol) (ODbL) or
+[The OpenSky Network](https://opensky-network.org). Magnetic declination: NOAA. The palette is adapted
+from FAA sectional charts.
+
+A hobby project. No accounts, no tracking, no paid tier — your logbook lives in your own browser.
