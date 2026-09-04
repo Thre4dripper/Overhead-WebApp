@@ -5,6 +5,7 @@ import { angleDelta, deadReckon } from './deadReckon';
 import { bearingDeg, elevationDeg, haversineM } from './geo';
 import { geohashBounds, geohashEncode, tilesCovering } from './geohash';
 import { parseClientMessage } from './protocol';
+import { parseReadsbResponse, readsbToStateVector } from './readsb';
 import { SyntheticAirspace } from './synthetic';
 import { fmtAltitude, fmtFlightLevel, fmtSpeed, fmtVerticalRate, squawkMeaning, trendArrow } from './units';
 
@@ -116,6 +117,38 @@ describe('protocol', () => {
     expect(parseClientMessage('{"type":"subscribe","tiles":["gcpu","gcpv"]}')).toEqual({ type: 'subscribe', tiles: ['gcpu', 'gcpv'] });
     expect(parseClientMessage('{"type":"subscribe","tiles":[1]}')).toBeNull();
     expect(parseClientMessage('nope')).toBeNull();
+  });
+});
+
+describe('readsb parser (community feeds)', () => {
+  const now = 1_788_466_375;
+  it('converts feet, knots and ft/min to metric and trims the callsign', () => {
+    const sv = readsbToStateVector({ hex: '4ca303', type: 'adsb_icao', flight: 'RYR34QB ', r: 'EI-DLX', t: 'B738', alt_baro: 11300, alt_geom: 11925, gs: 322.6, track: 307.19, baro_rate: 1536, squawk: '6312', category: 'A3', lat: 51.251407, lon: -0.632706, seen_pos: 0.4, seen: 0.1 }, now)!;
+    expect(sv.callsign).toBe('RYR34QB');
+    expect(sv.baroAltM).toBeCloseTo(3444.24, 1);
+    expect(sv.velocityMps).toBeCloseTo(165.96, 1);
+    expect(sv.verticalRateMps).toBeCloseTo(7.80, 1);
+    expect(sv.typeCode).toBe('B738');
+    expect(sv.registration).toBe('EI-DLX');
+    expect(sv.onGround).toBe(false);
+    expect(sv.timePosition).toBe(now);
+  });
+  it('treats "ground" as on the ground with no barometric altitude', () => {
+    const sv = readsbToStateVector({ hex: '42592e', type: 'adsb_icao_nt', alt_baro: 'ground', lat: 51.28, lon: -0.77, seen_pos: 14 }, now)!;
+    expect(sv.onGround).toBe(true);
+    expect(sv.baroAltM).toBeNull();
+  });
+  it('drops records with no position or a malformed address, and reads the TIS-B prefix', () => {
+    expect(readsbToStateVector({ hex: 'abcdef', type: 'mode_s' }, now)).toBeNull();
+    expect(readsbToStateVector({ hex: 'zzzzzz', lat: 1, lon: 1 }, now)).toBeNull();
+    expect(readsbToStateVector({ hex: '~a1b2c3', type: 'tisb_other', lat: 1, lon: 1 }, now)!.positionSource).toBe('tisb');
+  });
+  it('parses a whole response on the feed clock', () => {
+    const r = parseReadsbResponse({ ac: [{ hex: 'abcdef', lat: 1, lon: 2, alt_baro: 1000, seen_pos: 5 }, { hex: 'nope' }], now: 1_700_000_000_000 });
+    expect(r.aircraft).toHaveLength(1);
+    expect(r.rejected).toBe(1);
+    expect(r.aircraft[0]!.timePosition).toBe(1_700_000_000 - 5);
+    expect(r.time).toBe(1_700_000_000);
   });
 });
 

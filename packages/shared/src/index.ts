@@ -8,3 +8,4 @@ export * from './protocol';
 export * from './deadReckon';
 export * from './synthetic';
 export * from './opensky';
+export * from './readsb';
