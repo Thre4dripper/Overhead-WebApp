@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; background: #0f1115; }
+  a { color: #7dd3c0; }
+  a:hover { color: #a8e6d8; }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0f1115;color:#e9ebef;font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;padding:48px 48px 72px;box-sizing:border-box">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:840px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:#6b7684">Logbook · vector · 96 × 96</div>
+    <h1 style="margin:0;font-size:38px;font-weight:600;letter-spacing:-0.02em;line-height:1.05">Collectible stamps</h1>
+    <p style="margin:4px 0 0;font-size:15px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Eight awards, each borrowing a different piece of aviation paperwork: passport roundels, a riveted airframe data plate, a hexagonal placard, an airworthiness lozenge, a luggage tag, an altitude placard. Outline plus one central glyph does the work at 48 px — the small caps are texture at that size.</p>
+  </div>
+
+  <div style="margin-top:44px;background:#e6dabb;border:1px solid #1b2029;padding:40px 44px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:36px 28px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/first-sighting.svg" alt="First sighting stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">First sighting<br>passport roundel</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/wide-body.svg" alt="Wide-body stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">Wide-body<br>data plate</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/helicopter.svg" alt="Helicopter stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">Rotary<br>hex placard</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/rare-type.svg" alt="Rare type stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">Rare type<br>airworthiness lozenge</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/night-sighting.svg" alt="Night sighting stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">Night sighting<br>inked roundel</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/turboprop.svg" alt="Turboprop stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">Turboprop<br>luggage tag</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/century-club.svg" alt="Hundred sightings stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">100 sightings<br>double ring</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <img src="stamps/high-flyer.svg" alt="High flyer stamp" style="width:96px;height:96px;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#23384f;opacity:0.75;text-align:center">High flyer<br>altitude placard</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;margin-top:44px;background:#1b2029;border:1px solid #1b2029">
+    <div style="background:#e6dabb;padding:30px 34px;display:flex;flex-direction:column;gap:18px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:#23384f;opacity:0.7">At 48 px · awarded row</div>
+      <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center">
+        <img src="stamps/first-sighting.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/wide-body.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/helicopter.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/rare-type.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/night-sighting.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/turboprop.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/century-club.svg" alt="" style="width:48px;height:48px" />
+        <img src="stamps/high-flyer.svg" alt="" style="width:48px;height:48px" />
+      </div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:#23384f;opacity:0.7">At 32 px · dense list</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <img src="stamps/first-sighting.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/wide-body.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/helicopter.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/rare-type.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/night-sighting.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/turboprop.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/century-club.svg" alt="" style="width:32px;height:32px" />
+        <img src="stamps/high-flyer.svg" alt="" style="width:32px;height:32px" />
+      </div>
+    </div>
+    <div style="background:#12161d;padding:30px 34px;display:flex;flex-wrap:wrap;gap:26px">
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:190px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Palette</div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b9c1cc">
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#23384f;border:1px solid rgba(255,255,255,0.25)"></span>#23384F ink</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#efe7d3;border:1px solid rgba(255,255,255,0.25)"></span>#EFE7D3 paper</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#3a5c7d;border:1px solid rgba(255,255,255,0.25)"></span>#3A5C7D blue</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#8e3560;border:1px solid rgba(255,255,255,0.25)"></span>#8E3560 oxblood</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#6b7355;border:1px solid rgba(255,255,255,0.25)"></span>#6B7355 olive</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#a45a38;border:1px solid rgba(255,255,255,0.25)"></span>#A45A38 rust</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#2a3448;border:1px solid rgba(255,255,255,0.25)"></span>#2A3448 night fill</div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:12px">
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Rules</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.9;color:#b9c1cc">outline&nbsp;&nbsp;2.2–2.4 px<br>inner rule&nbsp;&nbsp;0.9–1 px<br>one accent per stamp<br>numerals&nbsp;&nbsp;27–30 px bold<br>small caps&nbsp;&nbsp;7–8.5 px / 0.18–0.2 em<br>roundels rotated −6° to 5°</div>
+        <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Silhouettes are the same paths as the 2D fallback icons, so a stamp and its map icon agree. Each badge is identified by outline shape first, glyph second, text last — which is the order legibility fails as they shrink.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1360,&quot;height&quot;:1120}}"></script>
+</body>
+</html>

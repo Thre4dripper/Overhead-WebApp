@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; background: #0f1115; }
+  a { color: #7dd3c0; }
+  a:hover { color: #a8e6d8; }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0f1115;color:#e9ebef;font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;padding:48px 48px 72px;box-sizing:border-box">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:#6b7684">Overlay · vector · portrait phone</div>
+    <h1 style="margin:0;font-size:38px;font-weight:600;letter-spacing:-0.02em;line-height:1.05">Altitude ruler and map HUD</h1>
+    <p style="margin:4px 0 0;font-size:15px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Hairline linework, one accent, no fills except the label plate. The ruler compresses altitude — near-linear to 2 000 ft, logarithmic to 45 000 — so rooftop traffic and cruising traffic both land on a readable scale.</p>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:28px;margin-top:44px;align-items:flex-start">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="position:relative;width:390px;height:844px;overflow:hidden;border:1px solid #262c36;border-radius:26px;background:#bcd0dd">
+        <img src="stills-sky/sky-midday-wide.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 70%" />
+        <img src="hud/overlay-day.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%" />
+      </div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#6b7684;letter-spacing:0.08em">390 × 844 · DAY · INK #12263C</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="position:relative;width:390px;height:844px;overflow:hidden;border:1px solid #262c36;border-radius:26px;background:#1b2440">
+        <img src="stills-sky/sky-night-wide.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 70%" />
+        <img src="hud/overlay-night.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%" />
+      </div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#6b7684;letter-spacing:0.08em">390 × 844 · NIGHT · INK #E7EDF4</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="position:relative;width:375px;height:667px;overflow:hidden;border:1px solid #262c36;border-radius:22px;background:#e0b184">
+        <img src="stills-sky/sky-golden-wide.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:55% 72%" />
+        <img src="hud/altitude-ruler-day.svg" alt="" style="position:absolute;right:8px;top:42px;width:96px;height:calc(100% - 84px)" />
+        <img src="hud/compass-reset-north-day.svg" alt="" style="position:absolute;left:16px;top:24px;width:76px;height:76px" />
+        <img src="hud/zoom-tilt-day.svg" alt="" style="position:absolute;left:16px;bottom:24px;width:128px;height:108px" />
+        <img src="hud/aircraft-label-day.svg" alt="" style="position:absolute;left:52px;top:210px;width:176px;height:48px" />
+      </div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#6b7684;letter-spacing:0.08em">375 × 667 · SAME ANCHORS</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:48px;background:#1b2029;border:1px solid #1b2029">
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Ruler compression</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.85;color:#b9c1cc">p(a) = 0.30 · a / 2000<br><span style="color:#6b7684">for a ≤ 2 000 ft</span><br>p(a) = 0.30 + 0.70 · ln(a / 2000) / ln(22.5)<br><span style="color:#6b7684">for a &gt; 2 000 ft</span><br>y = yGround − p(a) · bandHeight</div>
+      <table style="border-collapse:collapse;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b9c1cc">
+        <tr><td style="color:#6b7684;padding:2px 14px 2px 0">GND</td><td>p 0.000</td><td style="color:#6b7684;padding-left:14px">y 740</td></tr>
+        <tr><td style="color:#6b7684;padding:2px 14px 2px 0">1 000</td><td>p 0.150</td><td style="color:#6b7684;padding-left:14px">y 632</td></tr>
+        <tr><td style="color:#6b7684;padding:2px 14px 2px 0">2 000</td><td>p 0.300</td><td style="color:#6b7684;padding-left:14px">y 524</td></tr>
+        <tr><td style="color:#6b7684;padding:2px 14px 2px 0">10 000</td><td>p 0.662</td><td style="color:#6b7684;padding-left:14px">y 263</td></tr>
+        <tr><td style="color:#6b7684;padding:2px 14px 2px 0">20 000</td><td>p 0.818</td><td style="color:#6b7684;padding-left:14px">y 151</td></tr>
+        <tr><td style="color:#6b7684;padding:2px 14px 2px 0">40 000</td><td>p 0.973</td><td style="color:#6b7684;padding-left:14px">y 39</td></tr>
+      </table>
+    </div>
+
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Linework and type</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.9;color:#b9c1cc">axis / major tick&nbsp;&nbsp;1 px<br>minor tick&nbsp;&nbsp;0.75 px @ 55%<br>label plate stroke&nbsp;&nbsp;0.75 px @ 28%<br>leader line&nbsp;&nbsp;0.75 px @ 70%<br>tick labels&nbsp;&nbsp;11 px / 0.06 em<br>captions&nbsp;&nbsp;9 px / 0.18 em caps<br>callsign&nbsp;&nbsp;12 px semibold<br>true altitude&nbsp;&nbsp;10 px @ 78%<br>tilt readout&nbsp;&nbsp;15 px</div>
+      <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">No glow, no drop shadow, no filled panels. The label plate is the only fill in the system — 55% white by day, 50% near-black at night — so the overlay never reads as a surface sitting in front of the sky.</div>
+    </div>
+
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Palette and anchors</div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b9c1cc">
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#12263c;border:1px solid rgba(255,255,255,0.25)"></span>#12263C ink · day</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#e7edf4;border:1px solid rgba(255,255,255,0.25)"></span>#E7EDF4 ink · night</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#b0246e;border:1px solid rgba(255,255,255,0.25)"></span>#B0246E accent · day</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#e2589b;border:1px solid rgba(255,255,255,0.25)"></span>#E2589B accent · night</div>
+      </div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.9;color:#b9c1cc">ruler&nbsp;&nbsp;x = W − 104, y = 42, h = H − 84<br>compass&nbsp;&nbsp;x = 16, y = 24, 76 × 76<br>zoom + tilt&nbsp;&nbsp;x = 16, y = H − 132<br>labels&nbsp;&nbsp;at each aircraft screen point</div>
+      <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Every component is its own SVG with its own viewBox, so the app anchors them to the real viewport rather than scaling one fixed canvas. The ruler keeps a uniform scale (<span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px">xMaxYMid meet</span>); regenerate its ticks from p(a) when you want the band to fill an exact height.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;display:flex;flex-direction:column;gap:16px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:#6b7684">Components at nominal size</div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;background:#1b2029;border:1px solid #1b2029">
+      <div style="background:#bcd0dd;padding:26px 30px;display:flex;align-items:flex-start;gap:34px">
+        <img src="hud/altitude-ruler-day.svg" alt="Altitude ruler, day ink" style="width:96px;height:760px" />
+        <div style="display:flex;flex-direction:column;gap:30px;padding-top:8px">
+          <img src="hud/compass-reset-north-day.svg" alt="Compass, day ink" style="width:76px;height:76px" />
+          <img src="hud/zoom-tilt-day.svg" alt="Zoom and tilt, day ink" style="width:128px;height:108px" />
+          <img src="hud/aircraft-label-day.svg" alt="Aircraft label, day" style="width:176px;height:48px" />
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#12263c;opacity:0.7">DAY · INK #12263C · ACCENT #B0246E</div>
+        </div>
+      </div>
+      <div style="background:#1b2440;padding:26px 30px;display:flex;align-items:flex-start;gap:34px">
+        <img src="hud/altitude-ruler-night.svg" alt="Altitude ruler, night ink" style="width:96px;height:760px" />
+        <div style="display:flex;flex-direction:column;gap:30px;padding-top:8px">
+          <img src="hud/compass-reset-north-night.svg" alt="Compass, night ink" style="width:76px;height:76px" />
+          <img src="hud/zoom-tilt-night.svg" alt="Zoom and tilt, night ink" style="width:128px;height:108px" />
+          <img src="hud/aircraft-label-night.svg" alt="Aircraft label, night" style="width:176px;height:48px" />
+          <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#e7edf4;opacity:0.7">NIGHT · INK #E7EDF4 · ACCENT #E2589B</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1360,&quot;height&quot;:1600}}"></script>
+</body>
+</html>

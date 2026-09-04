@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sky, lighting and altitude treatment — 3D</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #0f1115; }
+  body { font-family: Helvetica, 'Helvetica Neue', Arial, sans-serif; color: #e9ebef; }
+  a { color: #7dd3c0; }
+  a:hover { color: #a8e6d8; }
+  three-d-stage:not(:defined) { visibility: hidden; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 18px 24px 0; }
+  h1 { margin: 0; font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
+  .meta { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: #79828f; letter-spacing: 0.06em; text-transform: uppercase; }
+  nav { display: flex; flex-wrap: wrap; gap: 18px; padding: 14px 24px 16px; align-items: center; }
+  .grp { display: flex; gap: 6px; align-items: center; }
+  .grp > span { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; color: #6b7684;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-right: 4px; }
+  button.cat { font: inherit; font-size: 13px; padding: 8px 14px; border-radius: 2px; border: 1px solid #262c36;
+    background: #171b22; color: #b9c1cc; cursor: pointer; }
+  button.cat:hover { border-color: #3a4453; color: #e9ebef; }
+  button.cat[aria-pressed="true"] { background: #e9ebef; color: #14171c; border-color: #e9ebef; }
+  .stagewrap { height: 46vh; min-height: 300px; display: flex; }
+  three-d-stage { display: block; width: 100%; height: 100%; flex: 1; min-height: 0; }
+  .spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px;
+    background: #1b2029; border-top: 1px solid #1b2029; }
+  .card { background: #12161d; padding: 16px 20px 18px; }
+  .card h2 { margin: 0 0 12px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #79828f; font-weight: 500; }
+  table { border-collapse: collapse; width: 100%; font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
+  th, td { text-align: left; padding: 3px 8px 3px 0; color: #b9c1cc; font-weight: 400; vertical-align: top; }
+  th { color: #6b7684; }
+  td.k { color: #79828f; }
+  .sw { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border: 1px solid rgba(255,255,255,0.25); vertical-align: baseline; }
+  .note { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: #9aa4b2; max-width: 46ch; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Bright midday · wide band</h1>
+  <div class="meta" id="note"></div>
+</header>
+<nav>
+  <div class="grp"><span>Light</span><div id="conds" style="display:flex;gap:6px"></div></div>
+  <div class="grp"><span>Framing</span><div id="views" style="display:flex;gap:6px"></div></div>
+</nav>
+<div class="stagewrap">
+  <three-d-stage id="stage" name="sky-treatment"></three-d-stage>
+</div>
+<div class="spec">
+  <div class="card">
+    <h2>Altitude bands — compressed</h2>
+    <table id="bandtable"></table>
+    <p class="note">Silhouette scale is applied on top of true perspective, so a cruising aircraft never falls under ~28 px on a 924 px frame. Aerial mix lerps the airframe colour toward the sky colour — the only cue that reads altitude when scale is ambiguous.</p>
+  </div>
+  <div class="card">
+    <h2>Condition — <span id="condname">midday</span></h2>
+    <table id="condtable"></table>
+    <p class="note" id="condnote"></p>
+  </div>
+  <div class="card">
+    <h2>Fixed rules</h2>
+    <table id="ruletable"></table>
+    <p class="note">The contrail's widest part is also its weakest: vertex alpha falls to zero at the aft end, so it dissipates instead of stopping. No billboards, no glow sprites, no labels.</p>
+  </div>
+</div>
+<script src="./three-d-stage.js"></script>
+<script type="module">
+  import * as THREE from 'three';
+  import { BANDS, CONDITIONS, buildSkyScene } from './sky-scene.js';
+
+  const stage = document.getElementById('stage');
+  await stage.ready;
+  stage._renderer.shadowMap.enabled = false;
+  stage._ground.visible = false;
+  stage._controls.enabled = true;
+
+  const EYE = new THREE.Vector3(0, 110, 130);
+  const WIDE_TARGET = new THREE.Vector3(0, 205, -520);
+  const cache = new Map();
+  let cond = CONDITIONS[0], view = 'wide';
+
+  function lightsFor(c) {
+    const g = new THREE.Group();
+    g.name = 'lighting_' + c.key;
+    for (const l of c.lights) {
+      if (l.kind === 'hemi') {
+        g.add(new THREE.HemisphereLight(l.sky, l.groundC, l.intensity));
+      } else {
+        const d = new THREE.DirectionalLight(l.color, l.intensity);
+        d.position.set(l.pos[0] * 1000, l.pos[1] * 1000, l.pos[2] * 1000);
+        g.add(d);
+      }
+    }
+    return g;
+  }
+
+  function frame() {
+    const cam = stage._camera;
+    const scene = cache.get(cond.key);
+    const target = view === 'wide'
+      ? WIDE_TARGET
+      : scene.targets.find((t) => t.band.key === view).position;
+    cam.fov = view === 'wide' ? 42 : 20;
+    cam.near = 5;
+    cam.far = 9000;
+    cam.position.copy(EYE);
+    cam.up.set(0, 1, 0);
+    cam.lookAt(target);
+    cam.updateProjectionMatrix();
+    stage._controls.target.copy(target);
+    stage._controls.update();
+    stage._render();
+  }
+
+  function apply() {
+    if (!cache.has(cond.key)) cache.set(cond.key, buildSkyScene(cond.key));
+    const scene = cache.get(cond.key);
+    for (const child of [...stage._scene.children]) {
+      if (child.isLight || child.name.startsWith('lighting_')) stage._scene.remove(child);
+    }
+    stage._scene.add(lightsFor(cond));
+    stage._scene.background = new THREE.Color(cond.sky);
+    stage._scene.fog = new THREE.Fog(cond.sky, cond.fog.near, cond.fog.far);
+    stage.setAttribute('background', '#' + new THREE.Color(cond.sky).getHexString());
+    stage.setObject(scene.root);
+    frame();
+    const label = view === 'wide' ? 'wide band' : BANDS.find((b) => b.key === view).label.toLowerCase();
+    document.getElementById('title').textContent = cond.label + ' · ' + label;
+    document.getElementById('note').textContent =
+      'fog ' + cond.fog.near + '–' + cond.fog.far + ' m · sky #' + new THREE.Color(cond.sky).getHexString();
+    document.getElementById('condname').textContent = cond.key;
+    document.getElementById('condnote').textContent = cond.note;
+    renderTables();
+    for (const b of document.getElementById('conds').children) b.setAttribute('aria-pressed', String(b.dataset.k === cond.key));
+    for (const b of document.getElementById('views').children) b.setAttribute('aria-pressed', String(b.dataset.k === view));
+  }
+
+  const hex = (n) => '#' + new THREE.Color(n).getHexString();
+  const swatch = (n) => '<span class="sw" style="background:' + hex(n) + '"></span>' + hex(n);
+
+  function renderTables() {
+    document.getElementById('bandtable').innerHTML =
+      '<tr><th>band</th><th>y</th><th>scale</th><th>aerial</th><th>trail L / W / α</th></tr>' +
+      BANDS.map((b) => '<tr><td class="k">' + b.label + '</td><td>' + b.y + ' m</td><td>' +
+        b.scale.toFixed(2) + '×</td><td>' + Math.round(b.aerial * 100) + '%</td><td>' +
+        (b.trail ? b.trail + ' m / 5→' + b.trailWidth + ' m / ' + b.trailOpacity : '—') + '</td></tr>').join('');
+    const rows = [
+      ['sky / fog colour', swatch(cond.sky)],
+      ['fog near / far', cond.fog.near + ' / ' + cond.fog.far + ' m (linear)'],
+      ['ground', swatch(cond.ground)],
+      ['building', swatch(cond.building)],
+      ['aircraft base', swatch(cond.aircraft)],
+      ['contrail', swatch(cond.trail)],
+      ['nav / beacon discs', cond.navLights ? 'on · r 3.4 m · sphere 10×8 · basic unlit · fog off' : 'off'],
+      ...(cond.navLights ? [
+        ['port / starboard', swatch(0xd8324f) + ' / ' + swatch(0x2fbf6a)],
+        ['tail / belly beacon', swatch(0xf2efe6) + ' / ' + swatch(0xd8324f)],
+        ['disc offsets (m)', 'port ∓17.4 x · tail +17 z · beacon −2.6 y'],
+      ] : []),
+      ...cond.lights.map((l, i) => l.kind === 'hemi'
+        ? ['hemisphere', l.intensity + ' · ' + hex(l.sky) + ' / ' + hex(l.groundC)]
+        : ['directional ' + i, l.intensity + ' · ' + hex(l.color) + ' · dir ' + l.pos.join(', ')]),
+    ];
+    document.getElementById('condtable').innerHTML = rows
+      .map(([k, v]) => '<tr><td class="k">' + k + '</td><td>' + v + '</td></tr>').join('');
+    document.getElementById('ruletable').innerHTML = [
+      ['camera eye', EYE.toArray().join(', ') + ' m'],
+      ['wide fov', '42°, target 0, 205, −520'],
+      ['band fov', '20° from the same eye'],
+      ['airframe material', 'standard · rough 0.72 · metal 0.12 · flat'],
+      ['building material', 'standard · rough 0.95 · metal 0 · flat'],
+      ['shadow map', 'off (massing reads by tone, not cast shadow)'],
+      ['ground plane', '6 000 m, y = −0.4'],
+      ['band spread', 'x −300 / −105 / 105 / 310 at z = −520'],
+      ['heading', '0.34 rad, identical per band'],
+      ['contrail geometry', '26-segment ribbon, 5 m at the tail → band width aft'],
+      ['contrail alpha', 'vertex alpha, α·(1−t)^1.5 → 0 at the aft end'],
+      ['contrail material', 'basic · vertexColors · DoubleSide · depthWrite false · fogged'],
+      ['contrail section', 'second ribbon in the vertical plane at 0.45× alpha'],
+    ].map(([k, v]) => '<tr><td class="k">' + k + '</td><td>' + v + '</td></tr>').join('');
+  }
+
+  for (const c of CONDITIONS) {
+    const b = document.createElement('button');
+    b.className = 'cat';
+    b.textContent = c.label;
+    b.dataset.k = c.key;
+    b.addEventListener('click', () => { cond = c; apply(); });
+    document.getElementById('conds').appendChild(b);
+  }
+  for (const v of [{ key: 'wide', label: 'Wide band' }, ...BANDS.map((b) => ({ key: b.key, label: b.label }))]) {
+    const b = document.createElement('button');
+    b.className = 'cat';
+    b.textContent = v.label;
+    b.dataset.k = v.key;
+    b.addEventListener('click', () => { view = v.key; apply(); });
+    document.getElementById('views').appendChild(b);
+  }
+  apply();
+
+  // --- still capture: renders into a light-DOM <img> (the stage canvas is
+  //     in shadow DOM and the capture tools cannot read it) ---
+  let lab = null;
+  function ensureLab() {
+    if (lab) return lab;
+    const w = window.innerWidth, h = window.innerHeight;
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(2);
+    renderer.setSize(w, h, false);
+    const camera = new THREE.PerspectiveCamera(42, w / h, 5, 9000);
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99;background:#000;display:none';
+    const img = document.createElement('img');
+    img.id = 'still';
+    img.style.cssText = 'width:100%;height:100%;display:block';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+    lab = { renderer, camera, img, overlay, scenes: new Map() };
+    return lab;
+  }
+
+  window.still = (condKey, viewKey) => {
+    const L = ensureLab();
+    if (!L.scenes.has(condKey)) {
+      const built = buildSkyScene(condKey);
+      const c = CONDITIONS.find((x) => x.key === condKey);
+      const sc = new THREE.Scene();
+      sc.background = new THREE.Color(c.sky);
+      sc.fog = new THREE.Fog(c.sky, c.fog.near, c.fog.far);
+      sc.add(lightsFor(c), built.root);
+      L.scenes.set(condKey, { sc, built });
+    }
+    const { sc, built } = L.scenes.get(condKey);
+    const target = viewKey === 'wide'
+      ? WIDE_TARGET
+      : built.targets.find((t) => t.band.key === viewKey).position;
+    L.camera.fov = viewKey === 'wide' ? 42 : 20;
+    L.camera.position.copy(EYE);
+    L.camera.lookAt(target);
+    L.camera.updateProjectionMatrix();
+    L.renderer.render(sc, L.camera);
+    L.img.src = L.renderer.domElement.toDataURL('image/png');
+    L.overlay.style.display = 'block';
+    return condKey + '/' + viewKey;
+  };
+  window.stillOff = () => { if (lab) lab.overlay.style.display = 'none'; };
+  window.CONDS = CONDITIONS.map((c) => c.key);
+  window.VIEWS = ['wide', ...BANDS.map((b) => b.key)];
+</script>
+</body>
+</html>

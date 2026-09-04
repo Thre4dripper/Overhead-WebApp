@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; background: #0f1115; }
+  a { color: #7dd3c0; }
+  a:hover { color: #a8e6d8; }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0f1115;color:#e9ebef;font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;padding:48px 48px 72px;box-sizing:border-box">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:#6b7684">Motion trail · vector · three variations</div>
+    <h1 style="margin:0;font-size:38px;font-weight:600;letter-spacing:-0.02em;line-height:1.05">Aircraft trail treatment</h1>
+    <p style="margin:4px 0 0;font-size:15px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">The last four minutes of travel, drawn in the air at the aircraft's own altitude rather than dropped onto the ground. Each trail is one path, projected from the aircraft's recent 3D positions through the view camera, so the app regenerates it every frame from coordinates.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;margin-top:44px;background:#1b2029;border:1px solid #1b2029">
+    <div style="background:#12161d;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:600">Tapering solid</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#6b7684">DAY</div>
+      </div>
+      <img src="trails/trail-taper-day.svg" data-sky="#bcd0dd" alt="Tapering solid trail, day sky" style="background:#bcd0dd;width:100%;height:auto;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">one closed outline · fill 50%<br>half-width 15 · age^0.95 · 1200/z</div>
+    </div>
+    <div style="background:#12161d;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:600">Tapering solid</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#6b7684">NIGHT</div>
+      </div>
+      <img src="trails/trail-taper-night.svg" data-sky="#1b2440" alt="Tapering solid trail, night sky" style="background:#1b2440;width:100%;height:auto;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">reads as mass · strongest cue of heading<br>widest at the tail of the aircraft</div>
+    </div>
+
+    <div style="background:#12161d;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:600">Dotted sequence</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#6b7684">DAY</div>
+      </div>
+      <img src="trails/trail-dots-day.svg" data-sky="#bcd0dd" alt="Dotted sequence trail, day sky" style="background:#bcd0dd;width:100%;height:auto;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">one dot per 10 s · 23 subpaths, one path<br>r 7 · age^0.9 · 1200/z, min 1.2</div>
+    </div>
+    <div style="background:#12161d;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:600">Dotted sequence</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#6b7684">NIGHT</div>
+      </div>
+      <img src="trails/trail-dots-night.svg" data-sky="#1b2440" alt="Dotted sequence trail, night sky" style="background:#1b2440;width:100%;height:auto;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">dot spacing carries speed<br>bunching reads as slower ground track</div>
+    </div>
+
+    <div style="background:#12161d;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:600">Fading gradient</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#6b7684">DAY</div>
+      </div>
+      <img src="trails/trail-fade-day.svg" data-sky="#bcd0dd" alt="Fading gradient trail, day sky" style="background:#bcd0dd;width:100%;height:auto;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">centreline stroked 9 px, round caps<br>stops 0 → 0.26 → 0.85 along the track</div>
+    </div>
+    <div style="background:#12161d;padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:15px;font-weight:600">Fading gradient</div>
+        <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;color:#6b7684">NIGHT</div>
+      </div>
+      <img src="trails/trail-fade-night.svg" data-sky="#1b2440" alt="Fading gradient trail, night sky" style="background:#1b2440;width:100%;height:auto;display:block" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">quietest of the three at night<br>no width cue, so heading reads weakest</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;display:flex;flex-direction:column;gap:16px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:#6b7684">Over the live view</div>
+    <div style="display:flex;flex-wrap:wrap;gap:2px;background:#1b2029;border:1px solid #1b2029">
+      <div style="position:relative;width:720px;height:420px;overflow:hidden">
+        <img src="stills-sky/sky-midday-wide.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 34%" />
+        <img src="trails/trail-taper-day.svg" data-sky="#bcd0dd" alt="Tapering solid trail over the midday view" style="position:absolute;inset:0;width:100%;height:100%" />
+      </div>
+      <div style="position:relative;width:720px;height:420px;overflow:hidden">
+        <img src="stills-sky/sky-night-wide.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 34%" />
+        <img src="trails/trail-fade-night.svg" data-sky="#1b2440" alt="Fading gradient trail over the night view" style="position:absolute;inset:0;width:100%;height:100%" />
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;margin-top:48px;background:#1b2029;border:1px solid #1b2029">
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Generating the path</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.9;color:#b9c1cc">sample the last 240 s of positions<br>project each: sx = 360 + f·x/z, sy = 210 − f·y/z<br>f = 686.9 px at fovV 34° · shallow tilt<br>taper&nbsp;&nbsp;offset ±half-width along the screen normal<br>dots&nbsp;&nbsp;one arc pair per sample, 10 s apart<br>fade&nbsp;&nbsp;stroke the centreline, gradient on its endpoints</div>
+      <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Perspective is in the width term, not just the geometry: <span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px">1200/z</span> shrinks the trail as it recedes, so it thins with both distance and age.</div>
+    </div>
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Which to ship</div>
+      <div style="font-size:13px;line-height:1.6;color:#b9c1cc;text-wrap:pretty">The tapering solid carries heading and recency in one shape and survives the night sky at low opacity — it is the recommendation for the default map. Dots are the honest choice when speed matters more than direction, since spacing is a direct read of ground speed. The gradient is the quietest and the right pick if trails are ever shown for many aircraft at once, where solid ribbons would compete with the aircraft themselves.</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.7;color:#79828f">trail ink&nbsp;&nbsp;#B0246E day · #E2589B night<br>every file exposes the trail as #trail</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1560,&quot;height&quot;:1600}}"></script>
+</body>
+</html>

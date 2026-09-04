@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; background: #0f1115; }
+  a { color: #7dd3c0; }
+  a:hover { color: #a8e6d8; }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0f1115;color:#e9ebef;font-family:Helvetica,'Helvetica Neue',Arial,sans-serif;padding:48px 48px 72px;box-sizing:border-box">
+  <div style="display:flex;flex-direction:column;gap:8px;max-width:840px">
+    <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:#6b7684">App icon · vector · 1024 × 1024</div>
+    <h1 style="margin:0;font-size:38px;font-weight:600;letter-spacing:-0.02em;line-height:1.05">Overhead</h1>
+    <p style="margin:4px 0 0;font-size:15px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Not a plane on a square — the view a person actually has. Two building masses lean in with their verticals converging to a vanishing point above the canvas, and the only thing in the open sky between them is one aircraft. Three shapes carry it: dark massing, the slot of sky, the magenta aircraft.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;margin-top:44px;background:#1b2029;border:1px solid #1b2029">
+    <div style="background:#12161d;padding:36px 40px;display:flex;flex-direction:column;gap:22px;align-items:center">
+      <img src="app-icon/overhead.svg" alt="Overhead app icon" style="width:320px;height:320px;display:block;border-radius:72px" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:#6b7684">Rounded square · 22.4% radius</div>
+    </div>
+    <div style="background:#12161d;padding:36px 40px;display:flex;flex-direction:column;gap:22px;align-items:center">
+      <img src="app-icon/overhead.svg" alt="Overhead app icon, circular mask" style="width:320px;height:320px;display:block;border-radius:50%" />
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:#6b7684">Round mask · safe circle r 410</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;margin-top:2px;background:#1b2029;border:1px solid #1b2029;border-top:0">
+    <div style="background:#12161d;padding:32px 40px;display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Down to 48 px</div>
+      <div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead.svg" alt="" style="width:128px;height:128px;border-radius:29px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#6b7684">128</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead.svg" alt="" style="width:80px;height:80px;border-radius:18px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#6b7684">80</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead.svg" alt="" style="width:48px;height:48px;border-radius:11px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#6b7684">48</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead.svg" alt="" style="width:32px;height:32px;border-radius:7px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#6b7684">32</span></div>
+      </div>
+    </div>
+    <div style="background:#e6dabb;padding:32px 40px;display:flex;flex-direction:column;gap:20px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#23384f;opacity:0.7">Monochrome badge</div>
+      <div style="display:flex;flex-wrap:wrap;gap:26px;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead-mono.svg" alt="Overhead monochrome silhouette" style="width:96px;height:96px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#23384f;opacity:0.7">96</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead-mono.svg" alt="" style="width:48px;height:48px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#23384f;opacity:0.7">48</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:center"><img src="app-icon/overhead-mono.svg" alt="" style="width:24px;height:24px" /><span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#23384f;opacity:0.7">24</span></div>
+        <div style="display:flex;align-items:center;gap:10px;background:#23384f;padding:8px 14px;border-radius:999px">
+          <img src="app-icon/overhead-mono.svg" alt="" style="width:22px;height:22px;filter:brightness(0) invert(1)" />
+          <span style="font-size:12.5px;color:#efe7d3">1 overhead now</span>
+        </div>
+      </div>
+      <div style="font-size:12.5px;line-height:1.5;color:#23384f;opacity:0.8;max-width:44ch;text-wrap:pretty">The mono file drops the held-back canyon block so the two masses and the aircraft never merge at badge size, and paints in <span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px">currentColor</span> on a transparent ground.</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:44px;background:#1b2029;border:1px solid #1b2029">
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Construction</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.9;color:#b9c1cc">vanishing point&nbsp;&nbsp;512, −700<br>every vertical converges on it<br>left rooftops&nbsp;&nbsp;y 210 / 300<br>right rooftops&nbsp;&nbsp;y 360 / 440<br>canyon block&nbsp;&nbsp;y 620<br>aircraft&nbsp;&nbsp;228 units, 34°, at 566 · 206</div>
+      <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">The aircraft is 22% of the canvas — about 11 px at 48 — the smallest it can be and still read as an aeroplane rather than a dot.</div>
+    </div>
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Palette</div>
+      <div style="display:flex;flex-direction:column;gap:7px;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#b9c1cc">
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#c9d6dc;border:1px solid rgba(255,255,255,0.25)"></span>#C9D6DC sky</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#1d2e44;border:1px solid rgba(255,255,255,0.25)"></span>#1D2E44 near massing</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#3e5772;border:1px solid rgba(255,255,255,0.25)"></span>#3E5772 canyon block</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:11px;height:11px;background:#b0246e;border:1px solid rgba(255,255,255,0.25)"></span>#B0246E aircraft</div>
+      </div>
+      <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Magenta appears exactly once, on the aircraft — the same rule the map, trails and HUD follow.</div>
+    </div>
+    <div style="background:#12161d;padding:22px 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#79828f">Masks</div>
+      <div style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.9;color:#b9c1cc">canvas&nbsp;&nbsp;1024 square, full bleed<br>safe circle&nbsp;&nbsp;r 410 (80%)<br>rounded square&nbsp;&nbsp;r 229 (22.4%)<br>corners&nbsp;&nbsp;sky only</div>
+      <div style="font-size:12.5px;line-height:1.55;color:#9aa4b2;text-wrap:pretty">Rooftops, the slot and the aircraft all sit inside the safe circle; only the building flanks bleed, so either mask crops nothing that identifies the icon.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1360,&quot;height&quot;:1240}}"></script>
+</body>
+</html>
