@@ -1,0 +1,11 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
+  "globalEnv": ["NODE_ENV", "PORT", "HOST", "AIRCRAFT_PROVIDER", "OPENSKY_CLIENT_ID", "OPENSKY_CLIENT_SECRET", "REDIS_URL", "DATABASE_URL", "POLL_INTERVAL_MS", "MAX_ACTIVE_TILES", "TILE_IDLE_MS", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT", "CORS_ORIGIN", "AIRCRAFT_DB_CSV", "UPSTREAM_CONTACT", "VITE_API_URL", "VITE_WS_URL", "VITE_DEFAULT_LAT", "VITE_DEFAULT_LON"],
+  "tasks": {
+    "build": { "dependsOn": ["^build"], "outputs": ["dist/**"] },
+    "dev": { "cache": false, "persistent": true },
+    "typecheck": { "dependsOn": ["^build"] },
+    "test": { "dependsOn": ["^build"] }
+  }
+}
