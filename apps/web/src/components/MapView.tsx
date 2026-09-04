@@ -90,7 +90,7 @@ export function MapView() {
       } catch { /* bounds unavailable before load */ }
       const tiles = [...want]
         .sort((a, b) => haversineM(c.lat, c.lng, ...tileCentre(a)) - haversineM(c.lat, c.lng, ...tileCentre(b)))
-        .slice(0, 8).sort().join(',');
+        .slice(0, 8).join(',');
       if (tiles !== lastTiles) { lastTiles = tiles; runtime.connection?.setTiles(tiles.split(',')); }
     };
     const onMoveEnd = () => {

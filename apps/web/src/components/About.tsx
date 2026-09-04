@@ -48,7 +48,7 @@ export function About() {
 
       <h3>Data and credits</h3>
       <p className="muted">Map: <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a> © OpenMapTiles, data © OpenStreetMap contributors (ODbL). Terrain: Mapzen / AWS open data terrain tiles. Aircraft positions: {s.conn.attribution || 'community ADS-B feed'}. Type and registration come from OpenSky's aircraft database joined on the ICAO address; routes and destinations are not shown because no free feed provides them reliably.</p>
-      <p className="muted">Status: {s.conn.status}{s.conn.detail ? ` — ${s.conn.detail}` : ''}. Everything you save (logbook, stamps, watch rules) stays in this browser; there is no account and no server-side storage.</p>
+      <p className="muted">Status: {s.conn.status}{s.conn.detail ? ` — ${s.conn.detail}` : ''}. {s.conn.provider === 'opensky-edge' ? 'Positions come through a small edge function that fetches OpenSky and caches each map tile for everyone; aircraft types and registrations are not available in this mode (the aircraft database lives in the full relay).' : 'Positions come through the Overhead relay, which joins types and registrations from OpenSky\u2019s aircraft database.'} Everything you save (logbook, stamps, watch rules) stays in this browser; there is no account and no server-side storage.</p>
 
       <h3>Palette</h3>
       <div className="swatches" aria-hidden>

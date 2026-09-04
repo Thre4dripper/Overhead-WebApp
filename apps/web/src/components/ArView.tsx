@@ -29,7 +29,9 @@ export function ArView() {
   const iosLike = /iP(hone|ad|od)/.test(navigator.userAgent);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/declination?lat=${s.home.lat}&lon=${s.home.lon}`).then((r) => r.json()).then((j: { declination: number | null }) => setDeclination(j.declination)).catch(() => setDeclination(null));
+    fetch(`${API_URL}/api/declination?lat=${s.home.lat}&lon=${s.home.lon}`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json())
+      .then((j: { declination?: number | null }) => setDeclination(typeof j.declination === 'number' ? j.declination : null))
+      .catch(() => setDeclination(null));
   }, [s.home.lat, s.home.lon]);
 
   useEffect(() => {

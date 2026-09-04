@@ -43,7 +43,17 @@ aircraft once it appears.
 
 ## Hosting
 
-The web app is static and fits Vercel. The API is **not** a serverless function: it holds WebSockets
+**Free, all on Vercel (default):** OpenSky blocks direct browser calls (its CORS header allows only its
+own origin), so the web app talks to three tiny edge functions in `apps/web/api/` on the same origin.
+`/api/tiles/<tile>/frame` fetches OpenSky for one ~20 km tile and is cached at Vercel's edge for
+`FRAME_TTL_S` (20 s), so however many people watch an area it costs one OpenSky call per window.
+Add `OPENSKY_CLIENT_ID` and `OPENSKY_CLIENT_SECRET` as Vercel environment variables (server side only,
+the browser never sees them; without them the functions run anonymously on a 400-credit day shared by
+the deployment). Set `VITE_TRANSPORT=poll`. Trade-offs: no WebSocket push (20 s cadence, dead reckoning
+in between) and no aircraft types or registrations, because the aircraft database lives in the full relay.
+Skip step 1 below and leave `VITE_API_URL`/`VITE_WS_URL` blank.
+
+**With the relay:** the web app is static and fits Vercel. The API is **not** a serverless function: it holds WebSockets
 open, runs a poller every few seconds and keeps the tile cache and the 520 k-row aircraft database in
 memory, none of which survive on Vercel's request-scoped functions. Host it as one always-on container
 (Fly.io, Railway, Render "starter", or any VPS) and point the Vercel build at it.
@@ -67,7 +77,8 @@ memory, none of which survive on Vercel's request-scoped functions. Host it as o
    VITE_API_URL = https://<app>.fly.dev
    VITE_WS_URL  = wss://<app>.fly.dev/ws
    ```
-   Vercel gives you HTTPS, which the phone needs for location, camera and sensors.
+   Vercel gives you HTTPS, which the phone needs for location, camera and sensors. `?transport=poll` or
+   `?transport=ws` on the URL forces a transport when you want to compare.
 
 3. **Everything on one box** instead: build the web (`pnpm --filter @overhead/web build`), serve `apps/web/dist`
    with any static server or reverse proxy in front of the API on the same host, leave `VITE_API_URL` blank,

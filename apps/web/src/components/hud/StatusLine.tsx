@@ -19,6 +19,8 @@ export function StatusLine() {
       {conn.status === 'demo' && <span style={{ opacity: 0.7 }}>not real aircraft</span>}
       {mode === 'flat' && <span style={{ opacity: 0.6 }}>flat map</span>}
       {count > 0 && <span style={{ opacity: 0.6 }}>{count} overhead</span>}
+      {conn.creditsRemaining != null && conn.creditsRemaining > 0 && <span style={{ opacity: 0.6 }}>{conn.creditsRemaining} credits</span>}
+      {conn.retryAt && Date.now() < conn.retryAt && <span>quota used, retry {Math.max(1, Math.round((conn.retryAt - Date.now()) / 60000))} min</span>}
     </div>
   );
 }

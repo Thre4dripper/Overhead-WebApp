@@ -150,3 +150,14 @@ The owner dropped monetisation. Consequences applied:
 - **Phone fixes.** Android AR heading had a sign error (the orientation matrix already yields a
   compass heading; the extra negation inverted horizontal motion). Manual "drag to look" now drags
   the sky. The reversed diorama plane was a yaw sign (nose is −Z; heading east is −90°).
+
+## 2026-09-04 — Free deployment: edge-cached proxy, not direct browser calls (owner decision: keep it free)
+Measured: OpenSky answers with `access-control-allow-origin: https://opensky-network.org`, so a browser
+on any other origin cannot call it — a "no backend" mode is impossible. The free shape is three stateless
+Vercel edge functions on the web app's own origin (`apps/web/api`): `/api/tiles/<tile>/frame` (OpenSky
+fetch per geohash-4 tile, `s-maxage=20` so every viewer of a tile shares one call per window and the
+OAuth secret stays in Vercel env), `/api/config`, `/api/declination`. The web app's HTTP-polling
+transport works against either the relay or these functions; `VITE_TRANSPORT=auto|poll|ws`. Trade-offs
+recorded: 20 s cadence, no aircraft-database join (category from the emitter class), per-tile rather than
+clustered upstream calls. The full relay remains the upgrade path with the same client. The OpenSky
+parser moved to `packages/shared` so both servers and the tests share one slot-checked tuple schema.

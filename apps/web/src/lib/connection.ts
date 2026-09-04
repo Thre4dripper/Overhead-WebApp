@@ -1,9 +1,9 @@
 import { geohashBounds, SyntheticAirspace, airlineFromCallsign, resolveCategory, type Aircraft, type ServerMessage, type StateVector } from '@overhead/shared';
-import { API_URL, WS_URL } from './api';
+import { API_URL, POLL_INTERVAL_MS, TRANSPORT, WS_URL } from './api';
 
 export type ConnStatus = 'connecting' | 'live' | 'cached' | 'demo' | 'offline';
 
-export interface ConnectionInfo { status: ConnStatus; provider: string; attribution: string; detail?: string }
+export interface ConnectionInfo { status: ConnStatus; provider: string; attribution: string; detail?: string; creditsRemaining?: number | null; retryAt?: number | null }
 
 interface Opts {
   onFrame: (aircraft: Aircraft[], t: number) => void;
@@ -32,13 +32,17 @@ export class Connection {
 
   constructor(private readonly opts: Opts) {}
 
-  start(): void { this.stopped = false; this.connect(); }
+  start(): void {
+    this.stopped = false;
+    if (TRANSPORT === 'poll') void this.probeHttpOrDemo(); else this.connect();
+  }
 
   stop(): void {
     this.stopped = true;
     this.ws?.close(); this.ws = null;
     if (this.demoTimer) clearInterval(this.demoTimer);
     if (this.pingTimer) clearInterval(this.pingTimer);
+    if (this.httpTimer) clearInterval(this.httpTimer);
   }
 
   setTiles(tiles: string[]): void {
@@ -46,6 +50,8 @@ export class Connection {
     this.tiles = tiles;
     if (!same && this.ws?.readyState === WebSocket.OPEN) this.ws.send(JSON.stringify({ type: 'subscribe', tiles }));
     if (!same && this.demo) this.demo = null;
+    // polling: a new area deserves a prompt refresh, but never more than one round per 5 s
+    if (!same && this.httpTimer && Date.now() - this.httpLastAt > 5000) void this.httpRound();
   }
 
   private setInfo(patch: Partial<ConnectionInfo>): void {
@@ -90,11 +96,11 @@ export class Connection {
     setTimeout(() => this.connect(), delay);
   }
 
-  /** WS blocked? Try the HTTP frame endpoint; API fully unreachable? Go demo. */
+  /** No WebSocket? Use the HTTP frame endpoint (relay or edge functions); nothing at all? Demo traffic. */
   private async probeHttpOrDemo(): Promise<void> {
     try {
-      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(4000) }).then((r) => r.json()) as { provider: string; attribution: string };
-      this.setInfo({ provider: cfg.provider, attribution: cfg.attribution, status: 'cached', detail: 'WebSocket blocked — polling over HTTP' });
+      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json()) as { provider: string; attribution: string };
+      this.setInfo({ provider: cfg.provider, attribution: cfg.attribution, status: this.lastFrameAt ? 'cached' : 'connecting', detail: TRANSPORT === 'poll' ? undefined : 'WebSocket unavailable — polling over HTTP' });
       this.startHttpPolling();
     } catch {
       this.startDemo();
@@ -102,24 +108,59 @@ export class Connection {
   }
 
   private httpTimer: ReturnType<typeof setInterval> | null = null;
+  private httpLastAt = 0;
+  private httpFailures = 0;
+  private httpInFlight = false;
+
   private startHttpPolling(): void {
     if (this.httpTimer) return;
-    const poll = async () => {
-      if (this.ws?.readyState === WebSocket.OPEN) { if (this.httpTimer) clearInterval(this.httpTimer); this.httpTimer = null; return; }
-      for (const tile of this.tiles) {
-        try {
-          const f = await fetch(`${API_URL}/api/tiles/${tile}/frame`).then((r) => (r.ok ? r.json() : null)) as { t: number; aircraft: Aircraft[] } | null;
-          if (f) { this.lastFrameAt = Date.now(); this.opts.onFrame(f.aircraft, f.t); }
-        } catch { /* try next tile */ }
+    void this.httpRound();
+    this.httpTimer = setInterval(() => void this.httpRound(), POLL_INTERVAL_MS);
+  }
+
+  /**
+   * One polling round: the two nearest tiles, so per-tile edge caching is shared with other viewers.
+   * 429 from the feed pauses until the quota resets and says so; three network failures fall to demo.
+   */
+  private async httpRound(): Promise<void> {
+    if (this.stopped || this.httpInFlight) return;
+    if (this.ws?.readyState === WebSocket.OPEN) { if (this.httpTimer) clearInterval(this.httpTimer); this.httpTimer = null; return; }
+    if (this.info.retryAt && Date.now() < this.info.retryAt) return;
+    this.httpInFlight = true;
+    this.httpLastAt = Date.now();
+    let ok = 0, remaining: number | null = null;
+    try {
+      for (const tile of this.tiles.slice(0, 2)) {
+        const res = await fetch(`${API_URL}/api/tiles/${tile}/frame`, { signal: AbortSignal.timeout(15_000) });
+        const rem = res.headers.get('x-credits-remaining');
+        if (rem != null && rem !== '' && Number.isFinite(Number(rem))) remaining = Number(rem);
+        if (res.status === 429) {
+          const j = (await res.json().catch(() => ({}))) as { retryAfterS?: number };
+          const waitMs = Math.max(60, Number(j.retryAfterS ?? 600)) * 1000;
+          this.stopDemo();
+          this.setInfo({ status: this.lastFrameAt ? 'cached' : 'offline', creditsRemaining: 0, retryAt: Date.now() + waitMs, detail: `OpenSky quota used up — retrying in ${Math.max(1, Math.round(waitMs / 60000))} min` });
+          return;
+        }
+        if (res.status === 404) continue; // relay has no frame for this tile yet
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const f = (await res.json()) as { t: number; aircraft: Aircraft[] };
+        this.lastFrameAt = Date.now();
+        this.opts.onFrame(f.aircraft, f.t);
+        ok++;
       }
-    };
-    void poll();
-    this.httpTimer = setInterval(() => void poll(), 10_000);
+      this.httpFailures = 0;
+      if (ok > 0) { this.stopDemo(); this.setInfo({ status: 'live', creditsRemaining: remaining, retryAt: null, detail: remaining != null ? `${remaining} OpenSky credits left today` : undefined }); }
+    } catch (err) {
+      this.httpFailures++;
+      if (this.httpFailures >= 3 && !this.demoTimer) { this.startDemo(); this.setInfo({ detail: `Feed unreachable (${(err as Error).message})` }); }
+    } finally {
+      this.httpInFlight = false;
+    }
   }
 
   private startDemo(): void {
     if (this.demoTimer) return;
-    this.setInfo({ status: 'demo', provider: 'demo', attribution: 'Demo traffic — synthetic, not real aircraft', detail: 'API unreachable' });
+    this.setInfo({ status: 'demo', provider: 'demo', attribution: 'Demo traffic — synthetic, not real aircraft', detail: 'Feed unreachable' });
     const emit = () => {
       if (this.ws?.readyState === WebSocket.OPEN) { this.stopDemo(); return; }
       const c = this.opts.demoCenter();
