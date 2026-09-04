@@ -1,16 +1,30 @@
-import { FRAME_TTL_S, json } from './_opensky';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-export const config = { runtime: 'edge' };
-
-/** Same contract as the relay's /api/config, so the web app needs no mode switch. */
-export default function handler(): Response {
-  const authed = Boolean(process.env.OPENSKY_CLIENT_ID && process.env.OPENSKY_CLIENT_SECRET);
-  return json({
-    provider: 'opensky-edge',
-    attribution: 'Aircraft data: The OpenSky Network',
-    pollIntervalMs: FRAME_TTL_S * 1000,
-    transport: 'poll',
-    authenticated: authed,
+/**
+ * GET /api/config — the same contract the relay serves, so the browser needs no build-time mode switch.
+ * `frameEndpoint: 'raw'` tells the client to poll /api/opensky and parse OpenSky's own JSON itself;
+ * the relay answers `'enriched'` and pushes pre-joined frames with aircraft types over its socket.
+ *
+ * Import-free like every file under api/: Vercel type-checks these with nodenext resolution, where even
+ * a relative import needs a file extension, and bundles each one alone. `src/lib/edge-functions.test.ts`
+ * keeps this feed default in step with api/feed.ts.
+ */
+export default function handler(_req: VercelRequest, res: VercelResponse): void {
+  const feed = process.env.FEED === 'opensky' ? 'opensky' : 'adsblol';
+  const ttlS = Math.max(10, Number(process.env.FRAME_TTL_S ?? 30) || 30);
+  const opensky = feed === 'opensky';
+  res.setHeader('cache-control', 'public, s-maxage=300');
+  res.status(200).json({
+    provider: `${feed}-serverless`,
+    attribution: opensky ? 'Aircraft data: The OpenSky Network' : 'Aircraft data: adsb.lol community feed (ODbL)',
+    // the browser fetches the upstream's own JSON from /api/feed and parses it itself
+    frameEndpoint: 'raw',
+    feedFormat: opensky ? 'opensky' : 'readsb',
+    // OpenSky meters credits, so one tile per round; adsb.lol does not, so two tiles widen the view
+    pollIntervalMs: ttlS * 1000,
+    pollTiles: opensky ? 1 : 2,
+    authenticated: opensky ? Boolean(process.env.OPENSKY_CLIENT_ID && process.env.OPENSKY_CLIENT_SECRET) : true,
+    // the aircraft-database join lives only in the relay; adsb.lol carries types in the feed itself
     aircraftDbRows: 0,
-  }, 200, { 'cache-control': 'public, s-maxage=300' });
+  });
 }
