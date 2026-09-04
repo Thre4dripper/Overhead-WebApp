@@ -1,8 +1,14 @@
 # Aircraft data source
 
-Decision (revised 2026-09-04, owner): **OpenSky Network** with the owner's OAuth2 credentials, as a
-free non-commercial hobby project, plus a synthetic `demo` provider for offline work. The adsb.lol and
-airplanes.live providers were removed. The comparison below is kept for the record; the full report
+Decision (revised 2026-09-04, owner): **OpenSky Network** with the owner's OAuth2 credentials for the
+relay, as a free non-commercial hobby project, plus a synthetic `demo` provider for offline work.
+
+**Second revision, same day, forced by measurement:** OpenSky's network refuses Vercel's egress (see
+`docs/decisions.md`), so the serverless deployment proxies **adsb.lol** instead — free, no key, ODbL
+with attribution, and it carries the aircraft type and registration that OpenSky's state vectors lack.
+The feed is a variable (`FEED`), the wire format is announced by `/api/config`, and the browser holds a
+parser for each. airplanes.live stays out: it returns 403 to non-feeders (verified from Vercel: 403 in
+23 ms). The comparison below is kept for the record; the full report
 with URLs and quotes is `docs/research/aircraft-data-sources-2026-09-04.md`.
 
 What OpenSky gives us and how the app copes:

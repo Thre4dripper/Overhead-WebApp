@@ -151,13 +151,33 @@ The owner dropped monetisation. Consequences applied:
   compass heading; the extra negation inverted horizontal motion). Manual "drag to look" now drags
   the sky. The reversed diorama plane was a yaw sign (nose is −Z; heading east is −90°).
 
-## 2026-09-04 — Free deployment: edge-cached proxy, not direct browser calls (owner decision: keep it free)
-Measured: OpenSky answers with `access-control-allow-origin: https://opensky-network.org`, so a browser
-on any other origin cannot call it — a "no backend" mode is impossible. The free shape is three stateless
-Vercel edge functions on the web app's own origin (`apps/web/api`): `/api/tiles/<tile>/frame` (OpenSky
-fetch per geohash-4 tile, `s-maxage=20` so every viewer of a tile shares one call per window and the
-OAuth secret stays in Vercel env), `/api/config`, `/api/declination`. The web app's HTTP-polling
-transport works against either the relay or these functions; `VITE_TRANSPORT=auto|poll|ws`. Trade-offs
-recorded: 20 s cadence, no aircraft-database join (category from the emitter class), per-tile rather than
-clustered upstream calls. The full relay remains the upgrade path with the same client. The OpenSky
-parser moved to `packages/shared` so both servers and the tests share one slot-checked tuple schema.
+## 2026-09-04 — Free deployment: a cached proxy, and the feed that Vercel can reach
+Two measurements decided this.
+
+**Browsers cannot call these feeds.** OpenSky answers with
+`access-control-allow-origin: https://opensky-network.org`, so a page on any other origin is blocked.
+A "no server at all" build is impossible; the smallest honest shape is a proxy on the app's own origin.
+
+**OpenSky refuses Vercel's egress.** From Vercel functions in `bom1` and in `fra1`, and from the edge
+runtime, `opensky-network.org`, `/api/states/all` and `auth.opensky-network.org` all time out (the
+token request at 8 s, the states request with an immediate connection failure), while adsb.lol answers
+in 57 ms and NOAA in 690 ms from the same function, and OpenSky answers in ~440 ms from a normal
+network. There is no IPv6 record to blame. So the free deployment uses **adsb.lol** (ODbL, no key,
+attribution shown in the HUD), and OpenSky stays the relay's provider where it also has the
+aircraft-database join. `FEED=adsblol|opensky` selects it; `/api/config` declares the wire format and
+the client picks `parseReadsbResponse` or `parseOpenSkyResponse` accordingly. A happy side effect:
+adsb.lol carries type and registration per record, so the free path renders the right models without
+the 95 MB database.
+
+Three Vercel constraints, all learned by deploying:
+- a function may not import the workspace (`@overhead/shared` fails with "referencing unsupported
+  modules"), so the geohash decode is inlined and pinned by `src/lib/edge-functions.test.ts`;
+- every file under `api/` becomes a public endpoint, so a test file there ships as `/api/*.test`;
+- the edge runtime and the Web `Request`/`Response` signature both fail here: edge cannot reach the
+  upstream, and the Node runtime returned `FUNCTION_INVOCATION_TIMEOUT` for even a synchronous handler
+  until it used Vercel's `(req, res)` signature.
+
+## 2026-09-04 — Commit history carries no assistant trailers (owner decision)
+The 19 commits written on 2026-09-04 were rewritten to drop the `Co-Authored-By` trailer; the trees are
+byte-identical, verified against the pre-rewrite tree hash.
+

@@ -43,15 +43,27 @@ aircraft once it appears.
 
 ## Hosting
 
-**Free, all on Vercel (default):** OpenSky blocks direct browser calls (its CORS header allows only its
-own origin), so the web app talks to three tiny edge functions in `apps/web/api/` on the same origin.
-`/api/tiles/<tile>/frame` fetches OpenSky for one ~20 km tile and is cached at Vercel's edge for
-`FRAME_TTL_S` (20 s), so however many people watch an area it costs one OpenSky call per window.
-Add `OPENSKY_CLIENT_ID` and `OPENSKY_CLIENT_SECRET` as Vercel environment variables (server side only,
-the browser never sees them; without them the functions run anonymously on a 400-credit day shared by
-the deployment). Set `VITE_TRANSPORT=poll`. Trade-offs: no WebSocket push (20 s cadence, dead reckoning
-in between) and no aircraft types or registrations, because the aircraft database lives in the full relay.
-Skip step 1 below and leave `VITE_API_URL`/`VITE_WS_URL` blank.
+**Free, all on Vercel (default).** The web app plus three small Node functions in `apps/web/api/`, no
+server of your own:
+
+- `/api/feed?tile=<geohash4>` proxies one live feed for a ~20 km tile and is cached at Vercel's CDN for
+  `FRAME_TTL_S` (30 s), so however many people watch an area, it costs one upstream call per window.
+- `/api/config` tells the browser which wire format the feed returns; `/api/declination` backs the AR compass.
+
+Set `VITE_TRANSPORT=poll` and deploy. Nothing else is required, because the default feed is
+**adsb.lol**, which needs no key.
+
+> **OpenSky does not work from Vercel.** Measured on 2026-09-04 from functions in `bom1` and `fra1` and
+> from the edge runtime: `opensky-network.org`, its `/api/states/all` and `auth.opensky-network.org` all
+> time out, while adsb.lol answers in ~57 ms and NOAA in ~690 ms from the same function. OpenSky
+> evidently refuses that egress. Your credentials are still useful — the relay below uses them, and adds
+> the aircraft-database join — but on Vercel the feed has to be one that answers. `FEED=opensky` switches
+> back if that ever changes.
+
+Trade-offs of the free path: a 30 s cadence with dead reckoning in between rather than WebSocket push,
+one upstream call per tile rather than clustered calls, and no aircraft-database join — though adsb.lol
+carries the aircraft type and registration in the feed itself, so models and labels are still correct.
+Skip step 1 below and leave `VITE_API_URL` / `VITE_WS_URL` blank.
 
 **With the relay:** the web app is static and fits Vercel. The API is **not** a serverless function: it holds WebSockets
 open, runs a poller every few seconds and keeps the tile cache and the 520 k-row aircraft database in
@@ -76,6 +88,7 @@ memory, none of which survive on Vercel's request-scoped functions. Host it as o
    ```
    VITE_API_URL = https://<app>.fly.dev
    VITE_WS_URL  = wss://<app>.fly.dev/ws
+   VITE_TRANSPORT = auto
    ```
    Vercel gives you HTTPS, which the phone needs for location, camera and sensors. `?transport=poll` or
    `?transport=ws` on the URL forces a transport when you want to compare.
@@ -97,8 +110,12 @@ while the same page works on the desktop's `localhost` (which browsers treat as 
   `VITE_API_URL` can stay blank in dev and behind one reverse proxy in production.
 - MapLibre 6's worker is bundled explicitly (`src/lib/maplibreWorker.ts`) because both Vite's dep
   optimiser and the production bundler lose its `new URL(...)` reference otherwise.
-- OpenSky meters credits per account. The poller clusters adjacent tiles into one request, spends at
-  most `OPENSKY_DAILY_CREDITS ÷ 24` per hour, and pauses everything on 429.
+- OpenSky meters credits per account. The relay's poller clusters adjacent tiles into one request,
+  spends at most `OPENSKY_DAILY_CREDITS ÷ 24` per hour, and pauses everything on 429.
+- Vercel-side variables: `FEED` (`adsblol` default, or `opensky`), `FRAME_TTL_S` (CDN seconds per tile),
+  and `OPENSKY_CLIENT_ID` / `OPENSKY_CLIENT_SECRET` if you ever set `FEED=opensky`.
+- Every file under `apps/web/api/` becomes a public endpoint and is bundled alone: no tests there, and
+  no workspace imports. `src/lib/edge-functions.test.ts` pins the one duplicated helper.
 
 ## Status
 
