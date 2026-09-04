@@ -11,17 +11,20 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  */
 export default function handler(_req: VercelRequest, res: VercelResponse): void {
   const feed = process.env.FEED === 'opensky' ? 'opensky' : 'adsblol';
-  const ttlS = Math.max(10, Number(process.env.FRAME_TTL_S ?? 30) || 30);
+  const refreshSeconds = Math.max(10, Number(process.env.REFRESH_SECONDS ?? 30) || 30);
   const opensky = feed === 'opensky';
   res.setHeader('cache-control', 'public, s-maxage=300');
   res.status(200).json({
     provider: `${feed}-serverless`,
     attribution: opensky ? 'Aircraft data: The OpenSky Network' : 'Aircraft data: adsb.lol community feed (ODbL)',
+    // no WebSocket here: serverless functions cannot hold connections open
+    socket: null,
     // the browser fetches the upstream's own JSON from /api/feed and parses it itself
     frameEndpoint: 'raw',
     feedFormat: opensky ? 'opensky' : 'readsb',
+    refreshSeconds,
     // OpenSky meters credits, so one tile per round; adsb.lol does not, so two tiles widen the view
-    pollIntervalMs: ttlS * 1000,
+    pollIntervalMs: refreshSeconds * 1000,
     pollTiles: opensky ? 1 : 2,
     authenticated: opensky ? Boolean(process.env.OPENSKY_CLIENT_ID && process.env.OPENSKY_CLIENT_SECRET) : true,
     // the aircraft-database join lives only in the relay; adsb.lol carries types in the feed itself

@@ -1,22 +1,28 @@
 const envApi = import.meta.env.VITE_API_URL?.trim();
-const envWs = import.meta.env.VITE_WS_URL?.trim();
-
-export const API_URL = envApi && envApi.length > 0 ? envApi.replace(/\/$/, '') : window.location.origin;
-export const WS_URL = envWs && envWs.length > 0 ? envWs : `${API_URL.replace(/^http/, 'ws')}/ws`;
 
 /**
- * Transport to the aircraft feed:
- *   'ws'   — the relay's WebSocket (push, clustered polling, aircraft-database join)
- *   'poll' — HTTP GET /api/tiles/<tile>/frame every POLL_INTERVAL_MS. Served either by the relay or, with
- *            no server at all, by the Vercel edge functions in apps/web/api (cached per tile at the edge,
- *            OpenSky credentials in Vercel env, no CORS because it is the same origin)
- *   'auto' — try ws, fall back to poll, then to demo traffic
- * `?transport=poll|ws` on the URL overrides the build setting for testing.
+ * Where the aircraft feed lives. Blank means "this same origin", which covers both the serverless
+ * deployment (the functions in apps/web/api) and a single host serving the web app and the relay
+ * behind one proxy. Otherwise it is the relay's base URL, and the WebSocket URL is derived from it —
+ * one variable instead of two that could disagree.
+ */
+export const API_URL = envApi && envApi.length > 0 ? envApi.replace(/\/$/, '') : window.location.origin;
+export const WS_URL = `${API_URL.replace(/^http/, 'ws')}/ws`;
+
+/**
+ * How the browser gets frames:
+ *   'auto' (default) — ask GET /api/config: a relay advertises a socket, so use WebSocket push;
+ *                      the serverless functions do not, so poll. Neither reachable → demo traffic.
+ *   'ws'   — force the relay's WebSocket.
+ *   'poll' — force HTTP polling.
+ * `?transport=ws|poll` on the URL overrides the build setting, which is handy for comparing them.
  */
 export type Transport = 'auto' | 'ws' | 'poll';
 const tParam = new URLSearchParams(window.location.search).get('transport');
 export const TRANSPORT: Transport = (tParam === 'ws' || tParam === 'poll' ? tParam : (import.meta.env.VITE_TRANSPORT as Transport | undefined)) ?? 'auto';
-export const POLL_INTERVAL_MS = Math.max(10_000, Number(import.meta.env.VITE_POLL_INTERVAL_MS ?? 20_000) || 20_000);
+
+/** Fallback cadence, used only until GET /api/config states the real one. */
+export const DEFAULT_POLL_MS = 30_000;
 
 export const DEFAULT_HOME = {
   lat: Number(import.meta.env.VITE_DEFAULT_LAT ?? 51.47),

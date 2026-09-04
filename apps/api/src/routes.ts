@@ -7,14 +7,24 @@ import type { Subscriptions } from './ws';
 
 export function registerRoutes(app: FastifyInstance, deps: {
   meta: AircraftMetaStore; poller: TilePoller; store: TileStore; subs: Subscriptions;
-  provider: { id: string; attribution: string }; pollIntervalMs: number; creditsPerHour: number; startedAt: number;
+  provider: { id: string; attribution: string }; refreshSeconds: number; creditsPerHour: number | null; startedAt: number;
 }): void {
   app.get('/health', async () => ({ ok: true, uptimeS: Math.round((Date.now() - deps.startedAt) / 1000) }));
 
+  /**
+   * What the browser needs to configure itself, so the client has no build-time knowledge of the
+   * deployment. `socket` present means WebSocket push is available; `frameEndpoint: 'enriched'` means
+   * frames arrive already joined against the aircraft database. The serverless functions answer the
+   * same shape with `socket: null` and `frameEndpoint: 'raw'`.
+   */
   app.get('/api/config', async () => ({
     provider: deps.provider.id,
     attribution: deps.provider.attribution,
-    pollIntervalMs: deps.pollIntervalMs,
+    socket: '/ws',
+    frameEndpoint: 'enriched',
+    refreshSeconds: deps.refreshSeconds,
+    pollIntervalMs: deps.refreshSeconds * 1000,
+    pollTiles: 2,
     creditsPerHour: deps.creditsPerHour,
     aircraftDbRows: deps.meta.size,
   }));

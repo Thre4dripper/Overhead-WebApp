@@ -1,7 +1,20 @@
 import { geohashBounds, parseOpenSkyResponse, parseReadsbResponse, SyntheticAirspace, airlineFromCallsign, resolveCategory, type Aircraft, type ServerMessage, type StateVector } from '@overhead/shared';
-import { API_URL, POLL_INTERVAL_MS, TRANSPORT, WS_URL } from './api';
+import { API_URL, DEFAULT_POLL_MS, TRANSPORT, WS_URL } from './api';
 
 export type ConnStatus = 'connecting' | 'live' | 'cached' | 'demo' | 'offline';
+
+/** GET /api/config — how a deployment describes itself to the browser (relay and functions agree on this). */
+export interface ServerConfig {
+  provider: string;
+  attribution: string;
+  /** path to the WebSocket, or null when the deployment cannot hold connections open */
+  socket?: string | null;
+  frameEndpoint?: 'raw' | 'enriched';
+  feedFormat?: 'opensky' | 'readsb';
+  refreshSeconds?: number;
+  pollIntervalMs?: number;
+  pollTiles?: number;
+}
 
 export interface ConnectionInfo { status: ConnStatus; provider: string; attribution: string; detail?: string; creditsRemaining?: number | null; retryAt?: number | null }
 
@@ -42,7 +55,22 @@ export class Connection {
 
   start(): void {
     this.stopped = false;
-    if (TRANSPORT === 'poll') void this.probeHttpOrDemo(); else this.connect();
+    if (TRANSPORT === 'ws') { this.connect(); return; }
+    if (TRANSPORT === 'poll') { void this.probeHttpOrDemo(); return; }
+    // 'auto': let the deployment describe itself rather than guessing, so no build variable is needed
+    void this.autoDetect();
+  }
+
+  /** Ask the server what it is: a relay advertises a socket, the serverless functions do not. */
+  private async autoDetect(): Promise<void> {
+    try {
+      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json()) as ServerConfig;
+      this.applyConfig(cfg);
+      if (cfg.socket) this.connect(); else this.startHttpPolling();
+    } catch {
+      // no config endpoint: it may still be an older relay that only speaks WebSocket
+      this.connect();
+    }
   }
 
   stop(): void {
@@ -51,6 +79,15 @@ export class Connection {
     if (this.demoTimer) clearInterval(this.demoTimer);
     if (this.pingTimer) clearInterval(this.pingTimer);
     if (this.httpTimer) clearInterval(this.httpTimer);
+  }
+
+  /** Adopt the deployment's own settings: the server owns the cadence, because it owns the budget. */
+  private applyConfig(cfg: ServerConfig): void {
+    this.feedKind = cfg.frameEndpoint === 'raw' ? 'raw' : 'enriched';
+    this.feedFormat = cfg.feedFormat === 'readsb' ? 'readsb' : 'opensky';
+    this.pollIntervalMs = Math.max(10_000, cfg.pollIntervalMs ?? DEFAULT_POLL_MS);
+    this.pollTiles = Math.max(1, Math.min(4, cfg.pollTiles ?? 2));
+    this.setInfo({ provider: cfg.provider, attribution: cfg.attribution, status: this.lastFrameAt ? 'cached' : 'connecting' });
   }
 
   setTiles(tiles: string[]): void {
@@ -107,14 +144,9 @@ export class Connection {
   /** No WebSocket? Use the HTTP frame endpoint (relay or edge functions); nothing at all? Demo traffic. */
   private async probeHttpOrDemo(): Promise<void> {
     try {
-      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json()) as
-        { provider: string; attribution: string; frameEndpoint?: 'raw' | 'enriched'; feedFormat?: 'opensky' | 'readsb'; pollIntervalMs?: number; pollTiles?: number };
-      this.feedKind = cfg.frameEndpoint === 'raw' ? 'raw' : 'enriched';
-      this.feedFormat = cfg.feedFormat === 'readsb' ? 'readsb' : 'opensky';
-      // the server decides the cadence and how many tiles a round may cost, because it owns the credit budget
-      this.pollIntervalMs = Math.max(10_000, cfg.pollIntervalMs ?? POLL_INTERVAL_MS);
-      this.pollTiles = Math.max(1, Math.min(4, cfg.pollTiles ?? 2));
-      this.setInfo({ provider: cfg.provider, attribution: cfg.attribution, status: this.lastFrameAt ? 'cached' : 'connecting', detail: TRANSPORT === 'poll' ? undefined : 'WebSocket unavailable — polling over HTTP' });
+      const cfg = await fetch(`${API_URL}/api/config`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json()) as ServerConfig;
+      this.applyConfig(cfg);
+      if (TRANSPORT !== 'poll' && !cfg.socket) this.setInfo({ detail: undefined });
       this.startHttpPolling();
     } catch {
       this.startDemo();
@@ -129,7 +161,7 @@ export class Connection {
   private feedKind: 'enriched' | 'raw' = 'enriched';
   /** which wire format /api/feed returns when feedKind is 'raw' */
   private feedFormat: 'opensky' | 'readsb' = 'opensky';
-  private pollIntervalMs = POLL_INTERVAL_MS;
+  private pollIntervalMs = DEFAULT_POLL_MS;
   private pollTiles = 2;
 
   private startHttpPolling(): void {

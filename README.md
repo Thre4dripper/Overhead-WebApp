@@ -8,13 +8,19 @@ and alert rules stay in your browser.
 
 ```
 pnpm install
-cp .env.example .env          # add OPENSKY_CLIENT_ID / OPENSKY_CLIENT_SECRET from your OpenSky account
-pnpm dev                      # api on :8787, web on https://localhost:5173 (self-signed cert)
+cp .env.example .env          # defaults work as-is; see docs/configuration.md
+pnpm dev                      # relay on :8787, web on https://localhost:5173 (self-signed cert)
 ```
 
-On first start the API downloads OpenSky's aircraft database (~94 MB) into `data/` so aircraft types
-and registrations can be joined; until it is loaded, types fall back to the ADS-B emitter category.
-Routes: `/` homepage, `/live` the view (deep links go on `/live`).
+**Configuration in one line each:** `FEED` chooses the aircraft source (`adsblol`, `opensky`, `demo`)
+and is read by whichever server you run; `REFRESH_SECONDS` sets how often an area is refreshed;
+`VITE_API_URL` tells the browser where the feed lives (blank means this same origin). Everything else
+has a sensible default. **[docs/configuration.md](docs/configuration.md)** has the full reference and a
+recipe per deployment.
+
+With `FEED=opensky` the relay downloads OpenSky's aircraft database (~95 MB) into `data/` on first
+start, because OpenSky's positions carry no aircraft type or registration; the community feeds carry
+both, so nothing is downloaded for them. Routes: `/` homepage, `/live` the view.
 
 ## Layout
 
@@ -24,7 +30,7 @@ Routes: `/` homepage, `/live` the view (deep links go on `/live`).
 | `packages/shared` | types, units, geohash tiles, geo math, category tables, airline prefixes, WS protocol, dead reckoning, synthetic airspace |
 | `apps/api` | Fastify: OpenSky (OAuth2, credit-budgeted) and demo providers, in-memory tile poller with clustering, WebSocket fan-out, aircraft-database join, declination proxy |
 | `apps/web` | React + Vite PWA: homepage, MapLibre style in sectional-chart palette with night street lighting, three.js aircraft layer (spinning props, trails, drop lines, clouds), HUD, detail panel with orbitable model, overhead list, 2D and chart fallbacks, browser-side logbook and alerts, AR sky view |
-| `docs/` | design system, decisions, data-source and map-data comparisons, research notes, evidence |
+| `docs/` | configuration reference, design system, decisions, data-source and map-data comparisons, research notes, evidence |
 | `assets/` | approved Claude Design assets (untouched); runtime copies live in `apps/web/public/assets` |
 
 ## Scripts
@@ -50,8 +56,8 @@ server of your own:
   `FRAME_TTL_S` (30 s), so however many people watch an area, it costs one upstream call per window.
 - `/api/config` tells the browser which wire format the feed returns; `/api/declination` backs the AR compass.
 
-Set `VITE_TRANSPORT=poll` and deploy. Nothing else is required, because the default feed is
-**adsb.lol**, which needs no key.
+Set `FEED=adsblol` and `REFRESH_SECONDS=30` and deploy. Nothing else is required: no key, and
+`VITE_API_URL` stays blank because the functions are on the same origin.
 
 > **OpenSky does not work from Vercel.** Measured on 2026-09-04 from functions in `bom1` and `fra1` and
 > from the edge runtime: `opensky-network.org`, its `/api/states/all` and `auth.opensky-network.org` all
@@ -87,9 +93,9 @@ memory, none of which survive on Vercel's request-scoped functions. Host it as o
    variables and deploy:
    ```
    VITE_API_URL = https://<app>.fly.dev
-   VITE_WS_URL  = wss://<app>.fly.dev/ws
-   VITE_TRANSPORT = auto
    ```
+   The WebSocket URL is derived from it, and `VITE_TRANSPORT=auto` (the default) discovers the socket
+   from `/api/config`.
    Vercel gives you HTTPS, which the phone needs for location, camera and sensors. `?transport=poll` or
    `?transport=ws` on the URL forces a transport when you want to compare.
 
@@ -106,14 +112,13 @@ while the same page works on the desktop's `localhost` (which browsers treat as 
 
 ## Dev notes
 
-- Vite reads the single root `.env` (`envDir: '../../'`) and proxies `/api` and `/ws` to the API, so
+- Vite reads the single root `.env` (`envDir: '../../'`) and proxies `/api` and `/ws` to the relay, so
   `VITE_API_URL` can stay blank in dev and behind one reverse proxy in production.
 - MapLibre 6's worker is bundled explicitly (`src/lib/maplibreWorker.ts`) because both Vite's dep
   optimiser and the production bundler lose its `new URL(...)` reference otherwise.
 - OpenSky meters credits per account. The relay's poller clusters adjacent tiles into one request,
   spends at most `OPENSKY_DAILY_CREDITS ÷ 24` per hour, and pauses everything on 429.
-- Vercel-side variables: `FEED` (`adsblol` default, or `opensky`), `FRAME_TTL_S` (CDN seconds per tile),
-  and `OPENSKY_CLIENT_ID` / `OPENSKY_CLIENT_SECRET` if you ever set `FEED=opensky`.
+- Vercel-side variables: `FEED` (`adsblol` default) and `REFRESH_SECONDS` (also the CDN cache window).
 - Every file under `apps/web/api/` becomes a public endpoint and is bundled alone: no tests there, and
   no workspace imports. `src/lib/edge-functions.test.ts` pins the one duplicated helper.
 

@@ -6,8 +6,10 @@ services:
     dockerfilePath: apps/api/Dockerfile
     plan: starter
     envVars:
-      - key: AIRCRAFT_PROVIDER
+      - key: FEED
         value: opensky
+      - key: REFRESH_SECONDS
+        value: "15"
       - key: OPENSKY_CLIENT_ID
         sync: false
       - key: OPENSKY_CLIENT_SECRET
@@ -15,7 +17,7 @@ services:
       - key: OPENSKY_DAILY_CREDITS
         value: "4000"
       - key: CORS_ORIGIN
-        value: https://overhead.vercel.app
+        value: https://overhead-web-app-web.vercel.app
       - key: AIRCRAFT_DB_CSV
         value: /data/aircraft-db.csv
     disk:

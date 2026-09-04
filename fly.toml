@@ -8,11 +8,12 @@ primary_region = "fra"         # pick a region near you
 [env]
   PORT = "8787"
   HOST = "0.0.0.0"
-  AIRCRAFT_PROVIDER = "opensky"
+  # opensky works from here (unlike Vercel); set the credentials with `fly secrets set`
+  FEED = "opensky"
+  REFRESH_SECONDS = "15"
   OPENSKY_DAILY_CREDITS = "4000"
-  POLL_INTERVAL_MS = "15000"
-  # set to your Vercel domain(s), comma separated
-  CORS_ORIGIN = "https://overhead.vercel.app"
+  # your web deployment's origin(s), comma separated — the browser is blocked without this
+  CORS_ORIGIN = "https://overhead-web-app-web.vercel.app"
   AIRCRAFT_DB_CSV = "/data/aircraft-db.csv"
 
 [[mounts]]

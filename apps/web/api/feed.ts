@@ -17,7 +17,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  *
  * Two rules keep it cheap: the query is keyed on a geohash-4 tile (~39 × 19.5 km) rather than an
  * arbitrary bounding box, so every viewer of an area shares one cache entry; and the response carries
- * `s-maxage`, so Vercel's CDN answers repeat views without touching the upstream. The body is the
+ * `s-maxage` of REFRESH_SECONDS, so Vercel's CDN answers repeat views without touching the upstream. The body is the
  * upstream's own JSON, untouched — the browser parses it with the same schemas the relay uses, so
  * there is exactly one parser per feed format in the project.
  *
@@ -114,7 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       return;
     }
     const b = geohashBounds(tile);
-    const ttlS = Math.max(10, Number(process.env.FRAME_TTL_S ?? 30) || 30);
+    const ttlS = Math.max(10, Number(process.env.REFRESH_SECONDS ?? 30) || 30);
     res.setHeader('x-feed', feed);
 
     let url: string;

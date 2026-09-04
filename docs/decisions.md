@@ -181,3 +181,13 @@ Three Vercel constraints, all learned by deploying:
 The 19 commits written on 2026-09-04 were rewritten to drop the `Co-Authored-By` trailer; the trees are
 byte-identical, verified against the pre-rewrite tree hash.
 
+
+## 2026-09-04 — One name per concept in the environment
+The relay called the upstream choice `AIRCRAFT_PROVIDER` while the serverless functions called it
+`FEED`, and the refresh cadence was `POLL_INTERVAL_MS` in one place and `FRAME_TTL_S` in the other.
+Both are now `FEED` and `REFRESH_SECONDS` everywhere, and the relay gained an adsb.lol provider so the
+values mean the same thing on either server. Two browser variables were deleted rather than renamed:
+`VITE_WS_URL` (derived from `VITE_API_URL`) and `VITE_POLL_INTERVAL_MS` (the server states the cadence
+in `GET /api/config`). `VITE_TRANSPORT=auto` now fetches that config first and uses a WebSocket only
+when the deployment advertises one, so a Vercel-only deployment needs no transport setting at all.
+Full reference and per-deployment recipes: docs/configuration.md.
