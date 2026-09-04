@@ -28,6 +28,18 @@ export function AircraftLabels() {
     const root = ref.current!;
     const pool = new Map<string, Entry>();
     let raf = 0;
+    // Plates must not cover the HUD furniture. Measuring the real elements keeps this correct when the
+    // layout changes (phone stack vs desktop columns) instead of duplicating their positions here.
+    const HUD_SELECTOR = '.hud-compass, .hud-topright, .hud-tape, .hud-data, .hud-status, .hud-ruler, .hud-scale, .hud-attrib, .sheet, .detail';
+    let reserved: { x0: number; y0: number; x1: number; y1: number }[] = [];
+    let reservedAt = 0;
+    const measureReserved = () => {
+      const base = root.getBoundingClientRect();
+      reserved = [...document.querySelectorAll(HUD_SELECTOR)].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { x0: r.left - base.left - 4, y0: r.top - base.top - 4, x1: r.right - base.left + 4, y1: r.bottom - base.top + 4 };
+      });
+    };
     const loop = () => {
       const now = performance.now();
       const list = runtime.projected;
@@ -37,14 +49,8 @@ export function AircraftLabels() {
       const cand = list
         .filter((p) => p.visible && p.x > -10 && p.x < W + 10 && p.y > 2 && p.y < H - 40)
         .sort((a, b) => (a.icao24 === sel ? -1 : b.icao24 === sel ? 1 : 0) || b.lengthPx - a.lengthPx);
-      // HUD zones a plate must not cover: compass, top-right buttons, the ruler column, the bottom sheet
       const wide = W >= 900;
-      const reserved = [
-        { x0: 0, y0: 0, x1: 100, y1: 104 },
-        { x0: W - 170, y0: 0, x1: W, y1: 70 },
-        { x0: wide ? W - 480 : W - 108, y0: 0, x1: W, y1: H },
-        { x0: 0, y0: H - 72, x1: W, y1: H },
-      ];
+      if (now - reservedAt > 500) { measureReserved(); reservedAt = now; }
       const placed: { x0: number; y0: number; x1: number; y1: number }[] = [];
       const shown = new Set<string>();
       for (const p of cand) {

@@ -24,6 +24,8 @@ interface Palette {
   buildingFill: string; buildingLine: string; extrusion: string; extrusionTall: string;
   label: string; labelHalo: string; boundary: string; roadOpacity: number;
   street: string; shoreline: string;
+  /** blend OSM's own `colour` tag into the massing — right by day, wrong at night where buildings must stay dark */
+  tintOsmColour: boolean;
   /** warm streetlight colour; only set for the night palette */
   glow?: string;
   skyColor: string; horizonColor: string; fogColor: string;
@@ -35,7 +37,7 @@ export const PALETTES: Record<Theme, Palette> = {
     roadMinor: '#12263c', roadMajor: '#12263c', roadMotorway: '#12263c', rail: '#12263c', runway: '#12263c', apron: '#d2c59f',
     buildingFill: '#d0c197', buildingLine: '#12263c', extrusion: '#b9a67a', extrusionTall: '#c9b88c',
     label: '#12263c', labelHalo: '#e3d6b4', boundary: '#3a5c7d', roadOpacity: 0.22,
-    street: '#ece1c4', shoreline: '#7d9fb3',
+    street: '#ece1c4', shoreline: '#7d9fb3', tintOsmColour: true,
     skyColor: '#a9c4d6', horizonColor: '#d8e2e8', fogColor: '#cfdbe3',
   },
   golden: {
@@ -43,15 +45,15 @@ export const PALETTES: Record<Theme, Palette> = {
     roadMinor: '#2a2418', roadMajor: '#2a2418', roadMotorway: '#2a2418', rail: '#2a2418', runway: '#2a2418', apron: '#d3b98b',
     buildingFill: '#cfae7c', buildingLine: '#2a2418', extrusion: '#b98f5c', extrusionTall: '#c9a06d',
     label: '#2a2418', labelHalo: '#e2c89d', boundary: '#5a4a3a', roadOpacity: 0.22,
-    street: '#ebd4ab', shoreline: '#8e7a6c',
+    street: '#ebd4ab', shoreline: '#8e7a6c', tintOsmColour: true,
     skyColor: '#b48a72', horizonColor: '#f0cfa6', fogColor: '#e6c39c',
   },
   night: {
     land: '#161e33', residential: '#192239', industrial: '#171f36', park: '#152239', wood: '#131f34', water: '#0e1526', waterway: '#101a2e',
     roadMinor: '#e7edf4', roadMajor: '#e7edf4', roadMotorway: '#e7edf4', rail: '#e7edf4', runway: '#e7edf4', apron: '#1b2540',
-    buildingFill: '#212b46', buildingLine: '#e7edf4', extrusion: '#232e4a', extrusionTall: '#4a4a6a',
+    buildingFill: '#1c253c', buildingLine: '#e7edf4', extrusion: '#1e2740', extrusionTall: '#2b3654',
     label: '#e7edf4', labelHalo: '#161e33', boundary: '#7fa3c7', roadOpacity: 0.12,
-    street: '#1c2540', shoreline: '#3a4c70', glow: '#f3c47a',
+    street: '#1c2540', shoreline: '#3a4c70', tintOsmColour: false, glow: '#f3c47a',
     skyColor: '#0f1630', horizonColor: '#2a3557', fogColor: '#1b2440',
   },
 };
@@ -103,7 +105,7 @@ export function buildLayers(p: Palette): LayerSpecification[] {
       id: EXTRUSION_LAYER, type: 'fill-extrusion', source: 'openmaptiles', 'source-layer': 'building', minzoom: 13,
       filter: ['all', ['!=', ['get', 'hide_3d'], true], HAS_HEIGHT_DATA],
       paint: {
-        'fill-extrusion-color': ['case', ['has', 'colour'],
+        'fill-extrusion-color': ['case', ['all', p.tintOsmColour, ['has', 'colour']],
           ['interpolate', ['linear'], 0.35, 0, ['to-color', p.extrusion], 1, ['to-color', ['get', 'colour'], p.extrusion]],
           ['interpolate', ['linear'], BUILDING_HEIGHT_EXPR, 0, p.extrusion, 60, p.extrusion, 140, p.extrusionTall]],
         'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 13, 0, 13.6, BUILDING_HEIGHT_EXPR],
